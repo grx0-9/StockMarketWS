@@ -39,7 +39,6 @@ body {
   inset: 0;
 }
 
-/* ── SCREENS ── */
 .screen { display: none; flex-direction: column; height: 100%; overflow: hidden; }
 .screen.active { display: flex; }
 
@@ -48,10 +47,8 @@ body {
   align-items: center;
   justify-content: center;
   padding: 32px 24px;
-  gap: 0;
   background: var(--bg);
 }
-
 #joinScreen::before {
   content: '';
   position: absolute;
@@ -63,230 +60,127 @@ body {
   background-size: auto, 40px 40px, 40px 40px;
   pointer-events: none;
 }
-
 .join-inner { position: relative; width: 100%; max-width: 380px; }
 
-.brand {
-  text-align: center;
-  margin-bottom: 40px;
-}
-.brand-logo {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 5px;
-  color: var(--accent);
-  text-transform: uppercase;
-  margin-bottom: 16px;
-}
-.brand-title {
-  font-size: 52px;
-  font-weight: 800;
-  line-height: 0.9;
-  letter-spacing: -2px;
-  background: linear-gradient(135deg, #fff 0%, #8090aa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.brand-title em {
-  font-style: normal;
-  background: linear-gradient(90deg, var(--accent), var(--blue));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+.brand { text-align: center; margin-bottom: 40px; }
+.brand-logo { font-family: var(--mono); font-size: 11px; letter-spacing: 5px; color: var(--accent); text-transform: uppercase; margin-bottom: 16px; }
+.brand-title { font-size: 52px; font-weight: 800; line-height: 0.9; letter-spacing: -2px; background: linear-gradient(135deg, #fff 0%, #8090aa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.brand-title em { font-style: normal; background: linear-gradient(90deg, var(--accent), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 
-.join-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 28px 24px;
-}
-
-.join-label {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 12px;
-  display: block;
-}
-
-.name-input {
-  width: 100%;
-  background: var(--surface2);
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  padding: 16px 18px;
-  font-family: var(--sans);
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text);
-  outline: none;
-  margin-bottom: 16px;
-  transition: border-color 0.2s;
-}
-.name-input:focus { border-color: var(--accent); }
-.name-input::placeholder { color: var(--muted); font-weight: 400; }
-
-.join-btn {
-  width: 100%;
-  padding: 18px;
-  background: var(--accent);
-  color: #000;
-  border: none;
-  border-radius: 12px;
-  font-family: var(--sans);
-  font-size: 17px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.2s;
-  letter-spacing: 0.5px;
-}
-.join-btn:active { transform: scale(0.97); }
-
-.status-pill {
+/* Run duration badge on join screen */
+.run-info {
   display: flex;
   align-items: center;
-  gap: 8px;
   justify-content: center;
-  margin-top: 20px;
+  gap: 8px;
+  margin-bottom: 20px;
+  background: rgba(0,229,160,0.08);
+  border: 1px solid rgba(0,229,160,0.2);
+  border-radius: 10px;
+  padding: 10px 16px;
   font-family: var(--mono);
-  font-size: 11px;
-  color: var(--muted);
+  font-size: 12px;
+  color: var(--accent);
 }
+.run-info span { color: var(--muted); }
+
+.join-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px 24px; }
+.join-label { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; display: block; }
+.name-input { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 12px; padding: 16px 18px; font-family: var(--sans); font-size: 20px; font-weight: 700; color: var(--text); outline: none; margin-bottom: 16px; transition: border-color 0.2s; }
+.name-input:focus { border-color: var(--accent); }
+.name-input::placeholder { color: var(--muted); font-weight: 400; }
+.join-btn { width: 100%; padding: 18px; background: var(--accent); color: #000; border: none; border-radius: 12px; font-family: var(--sans); font-size: 17px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+.join-btn:active { transform: scale(0.97); }
+
+.status-pill { display: flex; align-items: center; gap: 8px; justify-content: center; margin-top: 20px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
 .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
 .dot.live { background: var(--green); box-shadow: 0 0 8px var(--green); animation: blink 2s infinite; }
 @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
 
-.error-msg {
-  background: rgba(255,68,102,0.1);
-  border: 1px solid rgba(255,68,102,0.3);
-  border-radius: 10px;
-  padding: 12px 16px;
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--red);
-  margin-top: 12px;
-  display: none;
-}
+.error-msg { background: rgba(255,68,102,0.1); border: 1px solid rgba(255,68,102,0.3); border-radius: 10px; padding: 12px 16px; font-family: var(--mono); font-size: 12px; color: var(--red); margin-top: 12px; display: none; }
 
 /* ── MAIN TRADING UI ── */
-#mainScreen {
-  flex-direction: column;
-  background: var(--bg);
-}
+#mainScreen { flex-direction: column; background: var(--bg); }
 
-/* TOP BAR */
-.topbar {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px 10px;
-  gap: 10px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-
+.topbar { display: flex; align-items: center; padding: 12px 16px 10px; gap: 10px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
 .topbar-logo { font-family: var(--mono); font-size: 12px; color: var(--accent); letter-spacing: 2px; font-weight: 700; }
 
-.timer-chip {
+/* Personal run timer — more prominent than before */
+.run-timer {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 5px 10px;
   font-family: var(--mono);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
-  transition: color 0.3s, border-color 0.3s;
 }
-.timer-chip.urgent { color: var(--red); border-color: rgba(255,68,102,0.4); animation: blink 1s infinite; }
+.run-timer-label { font-size: 9px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
+.run-timer.urgent { color: var(--red); border-color: rgba(255,68,102,0.4); animation: blink 1s infinite; }
+.run-timer.ended-chip { color: var(--muted); border-color: var(--border); font-size: 11px; }
 
-.player-badge {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 5px 10px;
-  font-size: 13px;
-  font-weight: 700;
-  max-width: 100px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.player-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; font-size: 13px; font-weight: 700; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* PORTFOLIO STRIP */
-.portfolio-strip {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 10px 16px;
-  display: flex;
-  gap: 16px;
-  flex-shrink: 0;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
+.portfolio-strip { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; gap: 16px; flex-shrink: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .portfolio-strip::-webkit-scrollbar { display: none; }
-
 .strip-stat { flex-shrink: 0; }
 .strip-label { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
 .strip-value { font-family: var(--mono); font-size: 16px; font-weight: 700; margin-top: 1px; }
 .strip-value.pos { color: var(--green); }
 .strip-value.neg { color: var(--red); }
 
-/* TAB NAV */
-.tab-nav {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+/* Run-ended banner inside main screen */
+.run-ended-banner {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(255,68,102,0.08);
+  border-bottom: 1px solid rgba(255,68,102,0.25);
+  padding: 10px 16px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--red);
   flex-shrink: 0;
 }
-.tab-btn {
-  padding: 12px 4px;
-  text-align: center;
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--muted);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
-  user-select: none;
-}
+.run-ended-banner.show { display: flex; }
+
+/* TAB NAV */
+.tab-nav { display: grid; grid-template-columns: 1fr 1fr 1fr; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.tab-btn { padding: 12px 4px; text-align: center; font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; user-select: none; }
 .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-/* TAB CONTENT */
 .tab-content { display: none; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; flex-direction: column; }
 .tab-content.active { display: flex; }
 
-/* ── MARKET TAB ── */
-.market-list { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+/* ── NEWS FEED ── */
+.news-feed { padding: 8px 12px 4px; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; min-height: 84px; overflow: hidden; }
+.news-item { font-family: var(--mono); font-size: 11px; line-height: 1.4; padding: 5px 10px; border-radius: 8px; border-left: 2px solid transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: opacity 0.6s ease; }
+.news-item:nth-child(1) { opacity: 1; border-left-color: currentColor; background: rgba(255,255,255,0.04); }
+.news-item:nth-child(2) { opacity: 0.45; }
+.news-item:nth-child(3) { opacity: 0.18; }
+.news-item.bullish  { color: var(--green); }
+.news-item.bearish  { color: var(--red); }
+.news-item.neutral  { color: var(--yellow); }
+@keyframes newsSlideIn { from { opacity:0; transform:translateY(-14px); } to { opacity:1; transform:translateY(0); } }
+.news-item.fresh { animation: newsSlideIn 0.35s cubic-bezier(0.22,1,0.36,1) forwards; }
 
-.stock-row {
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-  -webkit-tap-highlight-color: transparent;
-}
+/* ── MARKET LIST ── */
+.market-list { padding: 8px 12px 12px; display: flex; flex-direction: column; gap: 8px; }
+.stock-row { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
 .stock-row:active { background: var(--surface2); }
 .stock-row.selected { border-color: var(--accent); }
-
+/* Dim stock rows when run has ended */
+.stock-row.run-over { opacity: 0.5; cursor: default; pointer-events: none; }
 .stock-sym { font-family: var(--mono); font-size: 16px; font-weight: 700; min-width: 52px; }
 .stock-name { font-size: 11px; color: var(--muted); margin-top: 1px; }
-
 .stock-chart { flex: 1; }
 .stock-chart svg { display: block; }
-
 .stock-right { text-align: right; flex-shrink: 0; }
 .stock-price { font-family: var(--mono); font-size: 16px; font-weight: 700; }
 .stock-pct { font-family: var(--mono); font-size: 11px; padding: 2px 7px; border-radius: 20px; margin-top: 2px; display: inline-block; }
@@ -294,257 +188,73 @@ body {
 .pct-down { background: rgba(255,68,102,0.15); color: var(--red); }
 
 /* ── TRADE DRAWER ── */
-.trade-drawer {
-  position: fixed;
-  bottom: 0;
-  left: 0; right: 0;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  border-radius: 20px 20px 0 0;
-  padding: 16px 20px calc(16px + var(--safe-bottom));
-  z-index: 200;
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
-  max-height: 70vh;
-  overflow-y: auto;
-}
+.trade-drawer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); border-radius: 20px 20px 0 0; padding: 16px 20px calc(16px + var(--safe-bottom)); z-index: 200; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32,0.72,0,1); max-height: 70vh; overflow-y: auto; }
 .trade-drawer.open { transform: translateY(0); }
-
-.drawer-handle {
-  width: 40px; height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  margin: 0 auto 16px;
-}
-
-.drawer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
+.drawer-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+.drawer-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 .drawer-sym { font-family: var(--mono); font-size: 22px; font-weight: 700; }
 .drawer-price { font-family: var(--mono); font-size: 22px; font-weight: 700; }
 .drawer-name { font-size: 12px; color: var(--muted); font-family: var(--mono); margin-bottom: 20px; }
-
-.side-toggle {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  background: var(--surface2);
-  border-radius: 10px;
-  padding: 4px;
-  margin-bottom: 16px;
-}
-.side-btn {
-  padding: 10px;
-  text-align: center;
-  border-radius: 8px;
-  font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  color: var(--muted);
-  transition: all 0.2s;
-}
+.side-toggle { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface2); border-radius: 10px; padding: 4px; margin-bottom: 16px; }
+.side-btn { padding: 10px; text-align: center; border-radius: 8px; font-family: var(--mono); font-size: 13px; font-weight: 700; cursor: pointer; color: var(--muted); transition: all 0.2s; }
 .side-btn.buy-active { background: var(--green); color: #000; }
 .side-btn.sell-active { background: var(--red); color: #fff; }
-
-.qty-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-.qty-stepper {
-  width: 44px; height: 44px;
-  border-radius: 10px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-size: 22px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  user-select: none;
-  flex-shrink: 0;
-  transition: all 0.15s;
-}
+.qty-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.qty-stepper { width: 44px; height: 44px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-size: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; flex-shrink: 0; transition: all 0.15s; }
 .qty-stepper:active { background: var(--surface3); border-color: var(--accent); }
-
-.qty-display {
-  flex: 1;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--mono);
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.cost-row {
-  display: flex;
-  justify-content: space-between;
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--muted);
-  margin-bottom: 4px;
-}
+.qty-display { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; height: 44px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 22px; font-weight: 700; }
+.cost-row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 4px; }
 .cost-row span:last-child { color: var(--text); font-weight: 700; }
-
-.warn-row {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--red);
-  margin-bottom: 8px;
-  min-height: 16px;
-}
-
-.exec-btn {
-  width: 100%;
-  padding: 16px;
-  border: none;
-  border-radius: 12px;
-  font-family: var(--sans);
-  font-size: 17px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.15s;
-  margin-top: 8px;
-}
+.warn-row { font-family: var(--mono); font-size: 11px; color: var(--red); margin-bottom: 8px; min-height: 16px; }
+.exec-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-family: var(--sans); font-size: 17px; font-weight: 800; cursor: pointer; transition: all 0.15s; margin-top: 8px; }
 .exec-btn.buy { background: var(--green); color: #000; }
-.exec-btn.buy:active { background: #00c880; }
 .exec-btn.sell { background: var(--red); color: #fff; }
-.exec-btn.sell:active { background: #cc3355; }
-
-.close-drawer {
-  position: absolute;
-  top: 16px; right: 20px;
-  font-size: 22px;
-  color: var(--muted);
-  cursor: pointer;
-  line-height: 1;
-}
+.close-drawer { position: absolute; top: 16px; right: 20px; font-size: 22px; color: var(--muted); cursor: pointer; line-height: 1; }
 
 /* ── PORTFOLIO TAB ── */
 .port-body { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-
-.port-summary-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 18px;
-}
+.port-summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
 .port-total-label { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
 .port-total { font-family: var(--mono); font-size: 34px; font-weight: 700; margin-bottom: 4px; }
 .port-pnl { font-family: var(--mono); font-size: 14px; font-weight: 700; }
 .port-pnl.pos { color: var(--green); }
 .port-pnl.neg { color: var(--red); }
-
 .port-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
 .port-mini { background: var(--surface2); border-radius: 10px; padding: 12px; }
 .port-mini-label { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
 .port-mini-val { font-family: var(--mono); font-size: 16px; font-weight: 700; margin-top: 4px; }
-
 .holdings-section { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); padding: 4px 4px 8px; }
-
-.holding-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+.holding-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
 .h-sym { font-family: var(--mono); font-size: 15px; font-weight: 700; flex: 1; }
 .h-qty { font-size: 12px; color: var(--muted); font-family: var(--mono); }
 .h-val { font-family: var(--mono); font-size: 15px; font-weight: 700; text-align: right; }
 .h-pct { font-family: var(--mono); font-size: 11px; text-align: right; }
-
 .empty-hold { text-align: center; color: var(--muted); font-family: var(--mono); font-size: 12px; padding: 32px 0; }
 
 /* ── LEADERBOARD TAB ── */
 .lb-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-
-.lb-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  transition: all 0.3s;
-}
+.lb-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; transition: all 0.3s; }
 .lb-card.me { border-color: var(--accent); background: rgba(0,229,160,0.04); }
-
-.lb-rank-num {
-  font-family: var(--mono);
-  font-size: 18px;
-  font-weight: 700;
-  width: 28px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.lb-avatar {
-  width: 40px; height: 40px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-
+.lb-card.run-done { opacity: 0.6; }
+.lb-rank-num { font-family: var(--mono); font-size: 18px; font-weight: 700; width: 28px; text-align: center; flex-shrink: 0; }
+.lb-avatar { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; flex-shrink: 0; }
 .lb-info { flex: 1; min-width: 0; }
 .lb-pname { font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.lb-trades { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
-
+.lb-sub { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
 .lb-nums { text-align: right; flex-shrink: 0; }
 .lb-total { font-family: var(--mono); font-size: 16px; font-weight: 700; }
 .lb-pnl-chip { font-family: var(--mono); font-size: 11px; margin-top: 2px; }
 .lb-pnl-chip.pos { color: var(--green); }
 .lb-pnl-chip.neg { color: var(--red); }
-
-.lb-header {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--muted);
-  padding: 4px 4px 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+.lb-header { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); padding: 4px 4px 8px; display: flex; align-items: center; gap: 8px; }
 .lb-live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: blink 2s infinite; }
 
-/* ── ENDED SCREEN ── */
-#endScreen {
-  align-items: center;
-  justify-content: flex-start;
-  overflow-y: auto;
-  padding: 32px 20px calc(32px + var(--safe-bottom));
-  gap: 20px;
-}
-
+/* ── RUN ENDED SCREEN ── */
+#endScreen { align-items: center; justify-content: flex-start; overflow-y: auto; padding: 32px 20px calc(32px + var(--safe-bottom)); gap: 20px; }
 .end-header { text-align: center; }
 .end-title { font-size: 42px; font-weight: 800; margin-bottom: 4px; }
 .end-sub { font-family: var(--mono); font-size: 12px; color: var(--muted); }
-
-.result-card {
-  width: 100%;
-  max-width: 400px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
-}
+.result-card { width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
 .result-rank-label { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
 .result-rank { font-size: 56px; font-weight: 800; line-height: 1; margin-bottom: 8px; }
 .result-name { font-size: 24px; font-weight: 700; margin-bottom: 16px; }
@@ -554,44 +264,16 @@ body {
 .rs-val { font-family: var(--mono); font-size: 18px; font-weight: 700; margin-top: 4px; }
 
 /* ── TOAST ── */
-.toasts {
-  position: fixed;
-  top: 70px;
-  left: 12px; right: 12px;
-  z-index: 999;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  pointer-events: none;
-}
-.toast {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px 16px;
-  font-family: var(--mono);
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  animation: tIn 0.25s ease;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-}
+.toasts { position: fixed; top: 70px; left: 12px; right: 12px; z-index: 999; display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+.toast { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; font-family: var(--mono); font-size: 13px; display: flex; align-items: center; gap: 10px; animation: tIn 0.25s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
 .toast.success { border-color: var(--green); }
 .toast.error { border-color: var(--red); }
 @keyframes tIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
 @keyframes tOut { to { opacity:0; transform:translateY(-8px); } }
 
-/* ── OVERLAY ── */
-.overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 199;
-  display: none;
-}
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 199; display: none; }
 .overlay.open { display: block; }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -605,6 +287,10 @@ body {
     <div class="brand">
       <div class="brand-logo">StockFloor</div>
       <div class="brand-title">Trade.<br><em>Win.</em></div>
+    </div>
+    <div class="run-info" id="runInfo" style="display:none">
+      ⏱ <strong id="runInfoMins">10</strong> min trading window
+      <span>· starts when you join</span>
     </div>
     <div class="join-card">
       <span class="join-label">Your Trading Name</span>
@@ -624,26 +310,24 @@ body {
   <div class="topbar">
     <div class="topbar-logo">SF</div>
     <div class="player-badge" id="playerBadge">—</div>
-    <div class="timer-chip" id="timerChip">--:--</div>
+    <div class="run-timer" id="runTimer">
+      <div>
+        <div class="run-timer-label">Your time</div>
+        <div id="runTimerVal">--:--</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Banner shown when player's own run ends but market is still open -->
+  <div class="run-ended-banner" id="runEndedBanner">
+    🏁 Your trading window has ended — positions liquidated. Watching live prices.
   </div>
 
   <div class="portfolio-strip">
-    <div class="strip-stat">
-      <div class="strip-label">Portfolio</div>
-      <div class="strip-value" id="stripTotal">$0</div>
-    </div>
-    <div class="strip-stat">
-      <div class="strip-label">Cash</div>
-      <div class="strip-value" id="stripCash">$0</div>
-    </div>
-    <div class="strip-stat">
-      <div class="strip-label">P&amp;L</div>
-      <div class="strip-value" id="stripPnl">$0</div>
-    </div>
-    <div class="strip-stat">
-      <div class="strip-label">Rank</div>
-      <div class="strip-value" id="stripRank">#—</div>
-    </div>
+    <div class="strip-stat"><div class="strip-label">Portfolio</div><div class="strip-value" id="stripTotal">$0</div></div>
+    <div class="strip-stat"><div class="strip-label">Cash</div><div class="strip-value" id="stripCash">$0</div></div>
+    <div class="strip-stat"><div class="strip-label">P&amp;L</div><div class="strip-value" id="stripPnl">$0</div></div>
+    <div class="strip-stat"><div class="strip-label">Rank</div><div class="strip-value" id="stripRank">#—</div></div>
   </div>
 
   <div class="tab-nav">
@@ -652,32 +336,29 @@ body {
     <div class="tab-btn" onclick="showTab('leaderboard')" id="tab-leaderboard">Board</div>
   </div>
 
-  <!-- MARKET TAB -->
   <div class="tab-content active" id="tab-content-market">
-    <div id="newsFeed" style="padding:10px 12px;font-family:var(--mono);font-size:11px;color:var(--yellow);"></div>
-<div class="market-list" id="marketList"></div>
+    <div class="news-feed" id="newsFeed"></div>
+    <div class="market-list" id="marketList"></div>
   </div>
 
-  <!-- PORTFOLIO TAB -->
   <div class="tab-content" id="tab-content-portfolio">
     <div class="port-body" id="portfolioBody"></div>
   </div>
 
-  <!-- LEADERBOARD TAB -->
   <div class="tab-content" id="tab-content-leaderboard">
     <div class="lb-body" id="lbBody"></div>
   </div>
 </div>
 
-<!-- ENDED -->
+<!-- RUN ENDED SCREEN (full screen, shown when market closes entirely) -->
 <div id="endScreen" class="screen">
   <div class="end-header">
-    <div class="end-title">🏁 Time's Up!</div>
-    <div class="end-sub" id="endSub">Session complete</div>
+    <div class="end-title">🏁 Run Complete!</div>
+    <div class="end-sub" id="endSub">Your trading window has closed</div>
   </div>
   <div class="result-card" id="myResultCard"></div>
   <div style="width:100%;max-width:400px">
-    <div class="lb-header"><div class="lb-live-dot"></div>Final Standings</div>
+    <div class="lb-header"><div class="lb-live-dot"></div>Leaderboard</div>
     <div id="endLbList" style="display:flex;flex-direction:column;gap:8px"></div>
   </div>
 </div>
@@ -688,10 +369,7 @@ body {
   <div class="drawer-handle"></div>
   <span class="close-drawer" onclick="closeDrawer()">×</span>
   <div class="drawer-header">
-    <div>
-      <div class="drawer-sym" id="drawerSym">—</div>
-      <div class="drawer-name" id="drawerName">—</div>
-    </div>
+    <div><div class="drawer-sym" id="drawerSym">—</div><div class="drawer-name" id="drawerName">—</div></div>
     <div class="drawer-price" id="drawerPrice">$—</div>
   </div>
   <div class="side-toggle">
@@ -712,41 +390,27 @@ body {
 <div class="toasts" id="toasts"></div>
 
 <script>
-// ── STATE ──
 const WS_URL = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}`;
 let ws, reconnectTimer;
-let myPlayer = null; // { id, name, cash, holdings, startCash, trades }
+let myPlayer = null;   // { id, name, cash, holdings, startCash, trades, runState, timeLeft }
 let tickers = [];
 let leaderboard = [];
-  let news = [];
-let timeLeft = 0;
-let timerInterval;
+let news = [];
+let serverState = null;
 let selectedSymbol = null;
 let tradeSide = 'buy';
 let tradeQty = 1;
-let sessionState = null;
+let lastNewsText = null;
+let serverConfig = {};
 
 const COLORS = ['#00e5a0','#00b8ff','#ffd24d','#ff4466','#a78bfa','#f97316','#ec4899','#84cc16'];
 
 // ── WEBSOCKET ──
 function connect() {
   ws = new WebSocket(WS_URL);
-
-  ws.onopen = () => {
-    setStatus('live', 'Session live — enter your name');
-    clearTimeout(reconnectTimer);
-  };
-
-  ws.onmessage = e => {
-    const msg = JSON.parse(e.data);
-    handle(msg);
-  };
-
-  ws.onclose = () => {
-    setStatus('off', 'Reconnecting...');
-    reconnectTimer = setTimeout(connect, 2000);
-  };
-
+  ws.onopen = () => { setStatus('live', 'Market open — enter your name'); clearTimeout(reconnectTimer); };
+  ws.onmessage = e => handle(JSON.parse(e.data));
+  ws.onclose = () => { setStatus('off', 'Reconnecting...'); reconnectTimer = setTimeout(connect, 2000); };
   ws.onerror = () => ws.close();
 }
 
@@ -756,68 +420,96 @@ function send(obj) {
 
 function handle(msg) {
   switch (msg.type) {
+
     case 'WELCOME':
-      sessionState = msg.session;
+      serverState = msg.serverState;
       tickers = msg.tickers || [];
       leaderboard = msg.leaderboard || [];
-      timeLeft = msg.timeLeft || 0;
-      if (msg.session === 'running') setStatus('live', 'Session live — enter your name');
-      else if (msg.session === 'ended') setStatus('off', 'Session ended');
-      else setStatus('off', 'Waiting for session to start...');
+      serverConfig = msg.config || {};
+      updateJoinStatus();
       break;
 
-    case 'SESSION_STARTED':
-      sessionState = 'running';
-      tickers = msg.tickers;
-      setStatus('live', 'Session started!');
+    case 'MARKET_OPENED':
+      serverState = 'open';
+      tickers = msg.tickers || [];
+      serverConfig = msg.config || {};
+      updateJoinStatus();
       break;
 
     case 'JOINED':
       myPlayer = msg.player;
       tickers = msg.tickers;
       leaderboard = msg.leaderboard;
-      timeLeft = msg.timeLeft;
+      news = msg.news || [];
       showMain();
-      startLocalTimer();
       renderAll();
       break;
 
     case 'PRICE_UPDATE':
-  tickers = msg.tickers;
-  leaderboard = msg.leaderboard;
-  news = msg.news || [];
-  renderNews();
-  renderMarket();
-  renderLeaderboard();
-  updateStrip();
-  updateDrawerPrice();
-  break;
+      tickers = msg.tickers;
+      leaderboard = msg.leaderboard;
+      news = msg.news || [];
+      renderNews();
+      renderMarket();
+      renderLeaderboard();
+      updateStrip();
+      updateDrawerPrice();
+      break;
 
     case 'LEADERBOARD_UPDATE':
       leaderboard = msg.leaderboard;
+      // Update my own entry from leaderboard (cash/invested may have changed on server)
+      if (myPlayer) {
+        const me = leaderboard.find(e => e.id === myPlayer.id);
+        if (me) {
+          myPlayer.cash = me.cash;
+          // runState might have been updated by server
+          if (me.runState === 'ended' && myPlayer.runState === 'active') {
+            myPlayer.runState = 'ended';
+            myPlayer.holdings = {};
+            onRunEnded();
+          }
+        }
+      }
       renderLeaderboard();
       updateStrip();
       break;
 
-    case 'TIMER':
-      timeLeft = msg.timeLeft;
-      renderTimer();
+    case 'PLAYER_TIMER':
+      // Personal timer tick — only sent to this player
+      if (myPlayer) {
+        myPlayer.timeLeft = msg.timeLeft;
+        renderRunTimer();
+      }
       break;
 
-    case 'TRADE_OK':
-      myPlayer.cash = msg.player.cash;
-      myPlayer.holdings = msg.player.holdings;
-      myPlayer.trades = msg.player.trades;
-      closeDrawer();
-      updateStrip();
-      renderPortfolio();
-      toast(`✓ ${msg.side.toUpperCase()} ${msg.qty}× ${msg.symbol} @ $${msg.price.toFixed(2)}`, 'success');
-      break;
-
-    case 'SESSION_ENDED':
-      sessionState = 'ended';
+    case 'RUN_ENDED':
+      // Server formally ended this player's run (time up)
+      myPlayer = { ...myPlayer, ...msg.player };
       leaderboard = msg.leaderboard;
+      onRunEnded();
+      renderLeaderboard();
+      updateStrip();
+      break;
+
+    case 'MARKET_CLOSED':
+      serverState = 'closed';
+      leaderboard = msg.leaderboard;
+      // If player's run wasn't already ended show the full end screen
       showEndScreen();
+      break;
+
+    case 'MARKET_RESET':
+      serverState = 'idle';
+      myPlayer = null;
+      tickers = [];
+      leaderboard = [];
+      news = [];
+      // Go back to join screen
+      document.getElementById('endScreen').classList.remove('active');
+      document.getElementById('mainScreen').classList.remove('active');
+      document.getElementById('joinScreen').classList.add('active');
+      updateJoinStatus();
       break;
 
     case 'ERROR':
@@ -826,15 +518,33 @@ function handle(msg) {
   }
 }
 
-// ── AUTH / JOIN ──
+// ── JOIN ──
 function join() {
   const name = document.getElementById('nameInput').value.trim();
   if (!name) { showErr('Enter your name!'); return; }
   send({ type: 'JOIN', name });
 }
 
-function setStatus(state, text) {
-  document.getElementById('statusDot').className = 'dot' + (state === 'live' ? ' live' : '');
+function updateJoinStatus() {
+  if (serverState === 'open') {
+    setStatus('live', 'Market open — enter your name');
+    const mins = Math.round((serverConfig.playerRunSecs || 600) / 60);
+    document.getElementById('runInfoMins').textContent = mins;
+    document.getElementById('runInfo').style.display = 'flex';
+    document.getElementById('joinBtn').disabled = false;
+  } else if (serverState === 'closed') {
+    setStatus('off', 'Market is closed');
+    document.getElementById('runInfo').style.display = 'none';
+    document.getElementById('joinBtn').disabled = true;
+  } else {
+    setStatus('off', 'Waiting for market to open...');
+    document.getElementById('runInfo').style.display = 'none';
+    document.getElementById('joinBtn').disabled = true;
+  }
+}
+
+function setStatus(st, text) {
+  document.getElementById('statusDot').className = 'dot' + (st === 'live' ? ' live' : '');
   document.getElementById('statusText').textContent = text;
 }
 
@@ -850,12 +560,24 @@ function showMain() {
   document.getElementById('joinScreen').classList.remove('active');
   document.getElementById('mainScreen').classList.add('active');
   document.getElementById('playerBadge').textContent = myPlayer.name;
+  renderRunTimer();
 }
 
 function showEndScreen() {
   document.getElementById('mainScreen').classList.remove('active');
   document.getElementById('endScreen').classList.add('active');
   renderEndScreen();
+}
+
+// Called when this player's personal run ends (time up), but market may still be open
+function onRunEnded() {
+  myPlayer.runState = 'ended';
+  myPlayer.holdings = {};
+  renderRunTimer();
+  document.getElementById('runEndedBanner').classList.add('show');
+  renderMarket();   // dims stock rows
+  renderPortfolio();
+  toast('⏰ Time\'s up! Positions liquidated.', 'error');
 }
 
 // ── TABS ──
@@ -868,26 +590,29 @@ function showTab(tab) {
   if (tab === 'leaderboard') renderLeaderboard();
 }
 
-// ── TIMER ──
-function startLocalTimer() {
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    if (timeLeft > 0) { timeLeft--; renderTimer(); }
-  }, 1000);
-}
+// ── RUN TIMER ──
+function renderRunTimer() {
+  if (!myPlayer) return;
+  const chip = document.getElementById('runTimer');
+  const val = document.getElementById('runTimerVal');
 
-function renderTimer() {
-  const m = Math.floor(timeLeft / 60);
-  const s = timeLeft % 60;
-  const chip = document.getElementById('timerChip');
-  chip.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  chip.classList.toggle('urgent', timeLeft <= 60 && timeLeft > 0);
+  if (myPlayer.runState === 'ended') {
+    chip.className = 'run-timer ended-chip';
+    val.textContent = 'Done';
+    return;
+  }
+
+  const t = myPlayer.timeLeft || 0;
+  const m = Math.floor(t / 60);
+  const s = t % 60;
+  val.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  chip.className = 'run-timer' + (t <= 60 && t > 0 ? ' urgent' : '');
 }
 
 // ── PORTFOLIO CALC ──
 function getInvestedValue() {
   if (!myPlayer) return 0;
-  return Object.entries(myPlayer.holdings).reduce((sum, [sym, qty]) => {
+  return Object.entries(myPlayer.holdings || {}).reduce((sum, [sym, qty]) => {
     const t = tickers.find(t => t.symbol === sym);
     return sum + (t ? t.price * qty : 0);
   }, 0);
@@ -907,54 +632,61 @@ function updateStrip() {
   if (!myPlayer) return;
   const total = getTotalValue();
   const pnl = total - myPlayer.startCash;
-  const pnlStr = (pnl >= 0 ? '+' : '-') + '$' + Math.abs(pnl).toFixed(0);
-
   document.getElementById('stripTotal').textContent = '$' + total.toFixed(0);
   document.getElementById('stripCash').textContent = '$' + myPlayer.cash.toFixed(0);
   const pnlEl = document.getElementById('stripPnl');
-  pnlEl.textContent = pnlStr;
+  pnlEl.textContent = (pnl >= 0 ? '+' : '-') + '$' + Math.abs(pnl).toFixed(0);
   pnlEl.className = 'strip-value ' + (pnl >= 0 ? 'pos' : 'neg');
   document.getElementById('stripRank').textContent = getMyRank();
 }
 
-// ── RENDER ALL ──
 function renderAll() {
   renderMarket();
   renderPortfolio();
   renderLeaderboard();
   updateStrip();
-  renderTimer();
+  renderRunTimer();
   renderNews();
+}
+
+// ── NEWS ──
+function renderNews() {
+  const feed = document.getElementById('newsFeed');
+  if (!feed) return;
+  const visible = news.slice(0, 3);
+  const isNew = visible.length > 0 && visible[0].text !== lastNewsText;
+  if (isNew) lastNewsText = visible[0].text;
+  feed.innerHTML = visible.map((n, i) => {
+    const freshClass = (i === 0 && isNew) ? ' fresh' : '';
+    return `<div class="news-item ${n.sentiment || 'neutral'}${freshClass}">${n.text}</div>`;
+  }).join('');
 }
 
 // ── MARKET ──
 function renderMarket() {
-  const list = document.getElementById('marketList');
-  list.innerHTML = tickers.map(t => {
+  const runOver = myPlayer?.runState === 'ended';
+  document.getElementById('marketList').innerHTML = tickers.map(t => {
     const up = t.price >= t.prevPrice;
-    const owned = myPlayer?.holdings[t.symbol] || 0;
+    const owned = myPlayer?.holdings?.[t.symbol] || 0;
     return `
-      <div class="stock-row ${selectedSymbol === t.symbol ? 'selected' : ''}" onclick="openDrawer('${t.symbol}')">
+      <div class="stock-row ${selectedSymbol === t.symbol ? 'selected' : ''} ${runOver ? 'run-over' : ''}"
+           onclick="${runOver ? '' : `openDrawer('${t.symbol}')`}">
         <div>
           <div class="stock-sym">${t.symbol}</div>
           <div class="stock-name">${t.name}${owned > 0 ? ` · ${owned}sh` : ''}</div>
         </div>
-        <div class="stock-chart">
-          ${sparkline(t.history, up)}
-        </div>
+        <div class="stock-chart">${sparkline(t.history, up)}</div>
         <div class="stock-right">
           <div class="stock-price" style="color:${up ? 'var(--green)' : 'var(--red)'}">$${t.price.toFixed(2)}</div>
           <div class="stock-pct ${up ? 'pct-up' : 'pct-down'}">${up ? '+' : ''}${t.changePct.toFixed(2)}%</div>
         </div>
-      </div>
-    `;
+      </div>`;
   }).join('');
 }
 
 function sparkline(history, up) {
   if (history.length < 2) return '';
-  const min = Math.min(...history), max = Math.max(...history);
-  const range = max - min || 1;
+  const min = Math.min(...history), max = Math.max(...history), range = max - min || 1;
   const w = 70, h = 28;
   const pts = history.map((v, i) => {
     const x = (i / (history.length - 1)) * w;
@@ -962,14 +694,14 @@ function sparkline(history, up) {
     return `${x.toFixed(1)},${y.toFixed(1)}`;
   });
   const color = up ? '#00e5a0' : '#ff4466';
-  const path = `M${pts.join('L')}`;
   return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
-    <path d="${path}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M${pts.join('L')}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`;
 }
 
 // ── DRAWER ──
 function openDrawer(symbol) {
+  if (myPlayer?.runState === 'ended') return;
   selectedSymbol = symbol;
   tradeQty = 1;
   const t = tickers.find(t => t.symbol === symbol);
@@ -993,13 +725,10 @@ function updateDrawerPrice() {
   if (!t) return;
   document.getElementById('drawerPrice').textContent = '$' + t.price.toFixed(2);
   document.getElementById('drawerPriceRef').textContent = '$' + t.price.toFixed(2);
-  const cost = t.price * tradeQty;
-  document.getElementById('drawerTotal').textContent = '$' + cost.toFixed(2);
-
-  // warn
+  document.getElementById('drawerTotal').textContent = '$' + (t.price * tradeQty).toFixed(2);
   let warn = '';
-  if (tradeSide === 'buy' && cost > (myPlayer?.cash || 0)) warn = '⚠ Not enough cash';
-  if (tradeSide === 'sell' && (myPlayer?.holdings[selectedSymbol] || 0) < tradeQty) warn = '⚠ Not enough shares';
+  if (tradeSide === 'buy' && t.price * tradeQty > (myPlayer?.cash || 0)) warn = '⚠ Not enough cash';
+  if (tradeSide === 'sell' && (myPlayer?.holdings?.[selectedSymbol] || 0) < tradeQty) warn = '⚠ Not enough shares';
   document.getElementById('drawerWarn').textContent = warn;
 }
 
@@ -1030,8 +759,7 @@ function renderPortfolio() {
   const total = getTotalValue();
   const pnl = total - myPlayer.startCash;
   const up = pnl >= 0;
-
-  const holdings = Object.entries(myPlayer.holdings).filter(([, q]) => q > 0);
+  const holdings = Object.entries(myPlayer.holdings || {}).filter(([, q]) => q > 0);
 
   document.getElementById('portfolioBody').innerHTML = `
     <div class="port-summary-card">
@@ -1046,20 +774,19 @@ function renderPortfolio() {
       </div>
     </div>
     <div class="holdings-section">Holdings (${holdings.length})</div>
-    ${holdings.length === 0 ? '<div class="empty-hold">No positions — tap Market to trade</div>' :
-      holdings.map(([sym, qty]) => {
-        const t = tickers.find(t => t.symbol === sym);
-        const val = t ? t.price * qty : 0;
-        const chg = t ? t.changePct : 0;
-        const chgUp = chg >= 0;
-        return `
-          <div class="holding-card" onclick="openDrawer('${sym}')">
+    ${holdings.length === 0
+      ? `<div class="empty-hold">${myPlayer.runState === 'ended' ? 'Run ended — all positions liquidated' : 'No positions — tap Market to trade'}</div>`
+      : holdings.map(([sym, qty]) => {
+          const t = tickers.find(t => t.symbol === sym);
+          const val = t ? t.price * qty : 0;
+          const chg = t ? t.changePct : 0;
+          const chgUp = chg >= 0;
+          return `<div class="holding-card" onclick="openDrawer('${sym}')">
             <div><div class="h-sym">${sym}</div><div class="h-qty">${qty} shares</div></div>
             <div style="flex:1"></div>
-            <div><div class="h-val">$${val.toFixed(2)}</div><div class="h-pct ${chgUp ? 'pnl-pos' : 'pnl-neg'}" style="color:${chgUp ? 'var(--green)' : 'var(--red)'}">${chgUp ? '+' : ''}${chg.toFixed(2)}%</div></div>
+            <div><div class="h-val">$${val.toFixed(2)}</div><div class="h-pct" style="color:${chgUp ? 'var(--green)' : 'var(--red)'}">${chgUp ? '+' : ''}${chg.toFixed(2)}%</div></div>
           </div>`;
-      }).join('')
-    }
+        }).join('')}
   `;
 }
 
@@ -1067,63 +794,82 @@ function renderPortfolio() {
 function renderLeaderboard() {
   const medals = ['🥇','🥈','🥉'];
   document.getElementById('lbBody').innerHTML = `
-    <div class="lb-header"><div class="lb-live-dot"></div>Live Standings — ${leaderboard.length} traders</div>
+    <div class="lb-header"><div class="lb-live-dot"></div>Standings — ${leaderboard.length} traders</div>
     ${leaderboard.map((p, i) => {
       const isMe = p.id === myPlayer?.id;
       const up = p.pnl >= 0;
       const color = COLORS[i % COLORS.length];
-      return `
-        <div class="lb-card ${isMe ? 'me' : ''}">
-          <div class="lb-rank-num" style="color:${i<3?['#ffd24d','#c0c8d8','#cd8f52'][i]:'var(--muted)'}">${medals[i] || i+1}</div>
-          <div class="lb-avatar" style="background:linear-gradient(135deg,${color},${COLORS[(i+2)%COLORS.length]})">${p.name[0].toUpperCase()}</div>
-          <div class="lb-info">
-            <div class="lb-pname">${p.name}${isMe ? ' 👈' : ''}</div>
-            <div class="lb-trades">${p.trades} trade${p.trades !== 1 ? 's' : ''}</div>
-          </div>
-          <div class="lb-nums">
-            <div class="lb-total">$${p.total.toFixed(0)}</div>
-            <div class="lb-pnl-chip ${up ? 'pos' : 'neg'}">${up ? '+' : ''}${p.pnlPct.toFixed(1)}%</div>
-          </div>
-        </div>`;
-    }).join('')}
-  `;
+      const runDone = p.runState === 'ended';
+      const timeStr = runDone
+        ? 'Run ended'
+        : `${Math.floor(p.timeLeft/60)}:${String(p.timeLeft%60).padStart(2,'0')} left`;
+      return `<div class="lb-card ${isMe ? 'me' : ''} ${runDone ? 'run-done' : ''}">
+        <div class="lb-rank-num" style="color:${i<3?['#ffd24d','#c0c8d8','#cd8f52'][i]:'var(--muted)'}">${medals[i]||i+1}</div>
+        <div class="lb-avatar" style="background:linear-gradient(135deg,${color},${COLORS[(i+2)%COLORS.length]})">${p.name[0].toUpperCase()}</div>
+        <div class="lb-info">
+          <div class="lb-pname">${p.name}${isMe ? ' 👈' : ''}</div>
+          <div class="lb-sub">${p.trades} trade${p.trades!==1?'s':''} · ${timeStr}</div>
+        </div>
+        <div class="lb-nums">
+          <div class="lb-total">$${p.total.toFixed(0)}</div>
+          <div class="lb-pnl-chip ${up?'pos':'neg'}">${up?'+':''}${p.pnlPct.toFixed(1)}%</div>
+        </div>
+      </div>`;
+    }).join('')}`;
 }
 
 // ── END SCREEN ──
 function renderEndScreen() {
   const myEntry = leaderboard.find(e => e.id === myPlayer?.id);
-  const rank = leaderboard.indexOf(myEntry) + 1;
+  const rank = myEntry ? leaderboard.indexOf(myEntry) + 1 : '?';
   const medals = ['🥇','🥈','🥉'];
   const medal = rank <= 3 ? medals[rank - 1] : `#${rank}`;
   const pnl = myEntry ? myEntry.pnl : 0;
   const up = pnl >= 0;
 
-  document.getElementById('endSub').textContent = `${leaderboard.length} traders · All positions liquidated`;
+  document.getElementById('endSub').textContent = `${leaderboard.length} trader${leaderboard.length!==1?'s':''} · All positions liquidated`;
   document.getElementById('myResultCard').innerHTML = myEntry ? `
     <div class="result-rank-label">Your Final Rank</div>
     <div class="result-rank">${medal}</div>
     <div class="result-name">${myEntry.name}</div>
     <div class="result-stats">
       <div class="rs"><div class="rs-label">Final Value</div><div class="rs-val">$${myEntry.total.toFixed(0)}</div></div>
-      <div class="rs"><div class="rs-label">P&amp;L</div><div class="rs-val" style="color:${up ? 'var(--green)' : 'var(--red)'}">${up ? '+' : ''}$${Math.abs(pnl).toFixed(0)}</div></div>
-      <div class="rs"><div class="rs-label">Return</div><div class="rs-val" style="color:${up ? 'var(--green)' : 'var(--red)'}">${up ? '+' : ''}${myEntry.pnlPct.toFixed(1)}%</div></div>
+      <div class="rs"><div class="rs-label">P&amp;L</div><div class="rs-val" style="color:${up?'var(--green)':'var(--red)'}">${up?'+':''}$${Math.abs(pnl).toFixed(0)}</div></div>
+      <div class="rs"><div class="rs-label">Return</div><div class="rs-val" style="color:${up?'var(--green)':'var(--red)'}">${up?'+':''}${myEntry.pnlPct.toFixed(1)}%</div></div>
       <div class="rs"><div class="rs-label">Trades</div><div class="rs-val">${myEntry.trades}</div></div>
-    </div>
-  ` : '';
+    </div>` : '<div style="text-align:center;color:var(--muted);font-family:var(--mono);padding:20px">No result data</div>';
 
   const medals2 = ['🥇','🥈','🥉'];
   document.getElementById('endLbList').innerHTML = leaderboard.map((p, i) => {
     const isMe = p.id === myPlayer?.id;
     const up2 = p.pnl >= 0;
-    return `<div class="lb-card ${isMe ? 'me' : ''}">
+    return `<div class="lb-card ${isMe?'me':''}">
       <div class="lb-rank-num" style="color:${i<3?['#ffd24d','#c0c8d8','#cd8f52'][i]:'var(--muted)'}">${medals2[i]||i+1}</div>
       <div class="lb-info"><div class="lb-pname">${p.name}</div></div>
       <div class="lb-nums">
         <div class="lb-total">$${p.total.toFixed(0)}</div>
-        <div class="lb-pnl-chip ${up2 ? 'pos' : 'neg'}">${up2 ? '+' : ''}${p.pnlPct.toFixed(1)}%</div>
+        <div class="lb-pnl-chip ${up2?'pos':'neg'}">${up2?'+':''}${p.pnlPct.toFixed(1)}%</div>
       </div>
     </div>`;
   }).join('');
+}
+
+// ── TRADE OK ──
+function handleTradeOk(msg) {
+  myPlayer.cash = msg.player.cash;
+  myPlayer.holdings = msg.player.holdings;
+  myPlayer.trades = msg.player.trades;
+  closeDrawer();
+  updateStrip();
+  renderPortfolio();
+  toast(`✓ ${msg.side.toUpperCase()} ${msg.qty}× ${msg.symbol} @ $${msg.price.toFixed(2)}`, 'success');
+}
+
+// Patch handle() for TRADE_OK
+const _handle = handle;
+function handle(msg) {
+  if (msg.type === 'TRADE_OK') { handleTradeOk(msg); return; }
+  _handle(msg);
 }
 
 // ── TOAST ──
@@ -1135,16 +881,6 @@ function toast(msg, type = 'success') {
   setTimeout(() => { el.style.animation = 'tOut 0.25s ease forwards'; setTimeout(() => el.remove(), 250); }, 2500);
 }
 
-function renderNews() {
-  const el = document.getElementById('newsFeed');
-  if (!el) return;
-
-  el.innerHTML = news.map(n => `📰 ${n.text}`).join('<br>');
-}
-
-
-
-// ── KEYBOARD ──
 document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') join(); });
 
 connect();
