@@ -30,7 +30,6 @@ body {
   color: var(--text);
   font-family: var(--sans);
   min-height: 100vh;
-  overflow-x: hidden;
 }
 
 body::before {
@@ -81,6 +80,7 @@ input[type="password"], input[type="text"], input[type="number"] {
 }
 input:focus { border-color: var(--accent); }
 input::placeholder { color: var(--muted); }
+input:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .btn {
   display: inline-flex;
@@ -98,9 +98,10 @@ input::placeholder { color: var(--muted); }
 }
 .btn-primary { background: var(--accent); color: #000; }
 .btn-primary:hover { background: #00ffa8; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,229,160,0.3); }
-.btn-primary:active { transform: translateY(0); }
 .btn-danger { background: var(--red); color: #fff; }
 .btn-danger:hover { background: #ff6680; }
+.btn-warning { background: var(--yellow); color: #000; }
+.btn-warning:hover { background: #ffe066; }
 .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
 .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
 .btn-sm { padding: 8px 16px; font-size: 13px; border-radius: 8px; }
@@ -108,10 +109,9 @@ input::placeholder { color: var(--muted); }
 
 .pin-error { color: var(--red); font-family: var(--mono); font-size: 12px; margin-top: 10px; display: none; }
 
-/* ── ADMIN APP ── */
+/* ── APP ── */
 #app { display: none; position: relative; z-index: 1; }
 
-/* HEADER */
 .admin-header {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -124,37 +124,33 @@ input::placeholder { color: var(--muted); }
   z-index: 100;
 }
 .admin-logo { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 2px; }
-.admin-badge {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  padding: 4px 10px;
-  border-radius: 20px;
-  background: rgba(255,212,77,0.15);
-  color: var(--yellow);
-  border: 1px solid rgba(255,212,77,0.3);
-}
-.conn-status {
+.admin-badge { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; background: rgba(255,212,77,0.15); color: var(--yellow); border: 1px solid rgba(255,212,77,0.3); }
+
+/* Market state pill */
+.market-state-pill {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-family: var(--mono);
-  font-size: 11px;
-  color: var(--muted);
-  margin-left: auto;
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
 }
-.cdot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
-.cdot.live { background: var(--green); box-shadow: 0 0 8px var(--green); animation: blink 2s infinite; }
+.market-state-pill.idle   { color: var(--muted); }
+.market-state-pill.open   { color: var(--green); border-color: rgba(0,229,160,0.3); background: rgba(0,229,160,0.06); }
+.market-state-pill.closed { color: var(--red); border-color: rgba(255,68,102,0.3); background: rgba(255,68,102,0.06); }
+.state-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.state-dot.blink { animation: blink 2s infinite; }
 @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
 
+.conn-status { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px; color: var(--muted); margin-left: auto; }
+.cdot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+.cdot.live { background: var(--green); box-shadow: 0 0 8px var(--green); animation: blink 2s infinite; }
+
 /* LAYOUT */
-.admin-body {
-  display: grid;
-  grid-template-columns: 340px 1fr;
-  gap: 0;
-  min-height: calc(100vh - 57px);
-}
+.admin-body { display: grid; grid-template-columns: 340px 1fr; gap: 0; min-height: calc(100vh - 57px); }
 
 .left-panel {
   background: var(--surface);
@@ -169,70 +165,70 @@ input::placeholder { color: var(--muted); }
   top: 57px;
 }
 
-.right-panel {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  overflow-y: auto;
-}
+.right-panel { padding: 24px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
 
-/* SECTION */
-.section-title {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 12px;
-}
+.section-title { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
 
-/* CONFIG */
 .config-group { display: flex; flex-direction: column; gap: 10px; }
 .config-row { display: flex; flex-direction: column; gap: 6px; }
 .config-label { font-family: var(--mono); font-size: 11px; letter-spacing: 1px; color: var(--muted); }
 
-/* TIMER BIG */
-.big-timer {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 20px;
-  text-align: center;
-}
-.big-timer-label { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
-.big-timer-val {
+/* Run duration info box */
+.run-duration-box {
+  background: rgba(0,184,255,0.07);
+  border: 1px solid rgba(0,184,255,0.2);
+  border-radius: 10px;
+  padding: 12px 14px;
   font-family: var(--mono);
-  font-size: 48px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  transition: color 0.3s;
+  font-size: 11px;
+  color: var(--blue);
+  line-height: 1.6;
 }
-.big-timer-val.urgent { color: var(--red); animation: blink 1s infinite; }
-.big-timer-val.idle { color: var(--muted); }
 
-/* SESSION CONTROL */
-.session-state {
+/* Control buttons */
+.controls-stack { display: flex; flex-direction: column; gap: 8px; }
+
+.divider { height: 1px; background: var(--border); }
+
+/* NEWS */
+.news-feed { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
+.news-item {
   background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 16px;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-family: var(--mono);
+  font-size: 11px;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--mono);
-  font-size: 13px;
-  margin-bottom: 12px;
+  align-items: flex-start;
+  gap: 8px;
+  animation: slideIn 0.3s ease;
 }
+.news-item.bullish { color: var(--green); }
+.news-item.bearish { color: var(--red); }
+.news-item.neutral { color: var(--muted); }
+@keyframes slideIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
 
-.state-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.state-waiting { background: var(--muted); }
-.state-running { background: var(--green); box-shadow: 0 0 10px var(--green); animation: blink 2s infinite; }
-.state-ended { background: var(--red); }
+/* STATS */
+.stat-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.stat-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.stat-label { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+.stat-val { font-family: var(--mono); font-size: 24px; font-weight: 700; margin-top: 4px; }
+.stat-val.accent { color: var(--accent); }
+
+/* MARKET GRID */
+.market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.market-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.mc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.mc-sym { font-family: var(--mono); font-size: 15px; font-weight: 700; }
+.mc-name { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.mc-badge { font-family: var(--mono); font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 700; }
+.badge-up { background: rgba(0,229,160,0.12); color: var(--green); }
+.badge-down { background: rgba(255,68,102,0.12); color: var(--red); }
+.mc-price { font-family: var(--mono); font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.spark { height: 32px; width: 100%; }
 
 /* PLAYERS TABLE */
 .players-table { display: flex; flex-direction: column; gap: 6px; }
-
 .player-row {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -241,57 +237,23 @@ input::placeholder { color: var(--muted); }
   display: flex;
   align-items: center;
   gap: 12px;
-  font-family: var(--mono);
-  font-size: 12px;
-  animation: slideIn 0.2s ease;
+  transition: border-color 0.3s;
 }
-@keyframes slideIn { from {opacity:0;transform:translateY(-6px)} to {opacity:1;transform:translateY(0)} }
-
-.p-avatar {
-  width: 28px; height: 28px;
-  border-radius: 7px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 800;
-  flex-shrink: 0;
-}
-.p-name { font-weight: 700; flex: 1; color: var(--text); font-family: var(--sans); font-size: 13px; }
-.p-cash { color: var(--muted); }
-.p-trades { color: var(--muted); }
-
-/* MARKET OVERVIEW */
-.market-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 10px;
-}
-
-.market-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 16px;
-}
-.mc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-.mc-sym { font-family: var(--mono); font-size: 15px; font-weight: 700; }
-.mc-name { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.mc-badge { font-family: var(--mono); font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 700; }
-.badge-up { background: rgba(0,229,160,0.12); color: var(--green); }
-.badge-down { background: rgba(255,68,102,0.12); color: var(--red); }
-.mc-price { font-family: var(--mono); font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.player-row.active-run { border-color: rgba(0,229,160,0.2); }
+.player-row.ended-run  { opacity: 0.55; }
+.p-avatar { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; }
+.p-name { font-weight: 700; flex: 1; font-family: var(--sans); font-size: 13px; }
+.p-timer { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--accent); }
+.p-timer.urgent { color: var(--red); animation: blink 1s infinite; }
+.p-timer.done { color: var(--muted); }
+.p-pnl { font-family: var(--mono); font-size: 12px; }
+.p-kick { font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 6px; background: rgba(255,68,102,0.1); color: var(--red); border: 1px solid rgba(255,68,102,0.2); cursor: pointer; flex-shrink: 0; }
+.p-kick:hover { background: rgba(255,68,102,0.2); }
 
 /* LEADERBOARD */
 .lb-table { display: flex; flex-direction: column; gap: 8px; }
-
-.lb-row {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  transition: all 0.4s ease;
-}
+.lb-row { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 14px; }
+.lb-row.ended { opacity: 0.6; }
 .lb-rank { font-family: var(--mono); font-size: 16px; font-weight: 700; width: 32px; text-align: center; flex-shrink: 0; }
 .lb-av { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; }
 .lb-info { flex: 1; }
@@ -303,69 +265,15 @@ input::placeholder { color: var(--muted); }
 .pnl-pos { color: var(--green); }
 .pnl-neg { color: var(--red); }
 
-/* SPARKLINE */
-.spark { height: 32px; width: 100%; }
-
-/* NEWS */
-.news-feed { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
-.news-item {
-  background: var(--surface2);
-  border-radius: 8px;
-  padding: 9px 12px;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--muted);
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  animation: slideIn 0.3s ease;
-}
-.news-icon { color: var(--accent); flex-shrink: 0; }
+.empty-state { text-align: center; color: var(--muted); font-family: var(--mono); font-size: 12px; padding: 24px 0; }
 
 /* TOAST */
-.toasts {
-  position: fixed;
-  bottom: 24px; right: 24px;
-  z-index: 9999;
-  display: flex; flex-direction: column; gap: 8px;
-  pointer-events: none;
-}
-.toast {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px 20px;
-  font-family: var(--mono);
-  font-size: 13px;
-  display: flex; align-items: center; gap: 10px;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.5);
-  animation: tIn 0.3s ease;
-  pointer-events: all;
-}
+.toasts { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 12px 20px; font-family: var(--mono); font-size: 13px; display: flex; align-items: center; gap: 10px; box-shadow: 0 6px 24px rgba(0,0,0,0.5); animation: tIn 0.3s ease; pointer-events: all; }
 .toast.success { border-color: var(--green); }
 .toast.error { border-color: var(--red); }
-@keyframes tIn { from {opacity:0;transform:translateX(20px)} to {opacity:1;transform:translateX(0)} }
-@keyframes tOut { to { opacity:0; } }
-
-.divider { height: 1px; background: var(--border); }
-
-.stat-bar {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 4px;
-}
-.stat-block {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 16px;
-}
-.stat-label { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
-.stat-val { font-family: var(--mono); font-size: 24px; font-weight: 700; margin-top: 4px; }
-.stat-val.accent { color: var(--accent); }
-
-.empty-state { text-align: center; color: var(--muted); font-family: var(--mono); font-size: 12px; padding: 24px 0; }
+@keyframes tIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+@keyframes tOut { to{opacity:0} }
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -391,6 +299,10 @@ input::placeholder { color: var(--muted); }
   <div class="admin-header">
     <div class="admin-logo">STOCKFLOOR</div>
     <div class="admin-badge">ADMIN</div>
+    <div class="market-state-pill idle" id="marketStatePill">
+      <div class="state-dot" id="marketStateDot"></div>
+      <span id="marketStateText">Idle</span>
+    </div>
     <div class="conn-status">
       <div class="cdot" id="connDot"></div>
       <span id="connText">Connecting</span>
@@ -398,33 +310,21 @@ input::placeholder { color: var(--muted); }
   </div>
 
   <div class="admin-body">
-    <!-- LEFT: CONTROLS -->
-    <div class="left-panel">
 
-      <!-- Session State -->
-      <div>
-        <div class="section-title">Session</div>
-        <div class="session-state">
-          <div class="state-dot" id="stateDot"></div>
-          <span id="stateText">Not Started</span>
-        </div>
-        <div class="big-timer">
-          <div class="big-timer-label">Time Remaining</div>
-          <div class="big-timer-val idle" id="bigTimer">--:--</div>
-        </div>
-      </div>
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
 
       <!-- Config -->
       <div>
-        <div class="section-title">Configuration</div>
+        <div class="section-title">Market Config</div>
         <div class="config-group">
           <div class="config-row">
             <label class="config-label">Starting Cash ($)</label>
             <input type="number" id="cfgCash" value="10000" min="1000" step="1000">
           </div>
           <div class="config-row">
-            <label class="config-label">Duration (minutes)</label>
-            <input type="number" id="cfgDuration" value="90" min="1" max="180">
+            <label class="config-label">Player Run Duration (minutes)</label>
+            <input type="number" id="cfgRunMins" value="10" min="1" max="120">
           </div>
           <div class="config-row">
             <label class="config-label">Volatility (1–10)</label>
@@ -435,41 +335,52 @@ input::placeholder { color: var(--muted); }
             <input type="number" id="cfgSpeed" value="4" min="1" max="15">
           </div>
         </div>
+        <div class="run-duration-box" style="margin-top:12px" id="runDurationInfo">
+          Market stays open indefinitely.<br>
+          Each player gets <strong id="runMinsDisplay">10</strong> min once they join.
+        </div>
       </div>
 
       <!-- Controls -->
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <button class="btn btn-primary" id="startBtn" onclick="startSession()" style="width:100%;padding:16px;font-size:16px">
-          🚀 Launch Session
-        </button>
-        <button class="btn btn-danger btn-sm" id="endBtn" onclick="endSession()" style="width:100%;display:none">
-          ⏹ End Session Now
-        </button>
+      <div>
+        <div class="section-title">Controls</div>
+        <div class="controls-stack">
+          <button class="btn btn-primary" id="openBtn" onclick="openMarket()" style="width:100%;padding:16px;font-size:15px">
+            🚀 Open Market
+          </button>
+          <button class="btn btn-danger btn-sm" id="closeBtn" onclick="closeMarket()" style="width:100%;display:none">
+            ⏹ Close Market
+          </button>
+          <button class="btn btn-warning btn-sm" id="resetBtn" onclick="resetMarket()" style="width:100%;display:none">
+            🔄 Reset Everything
+          </button>
+        </div>
       </div>
 
       <div class="divider"></div>
 
-      <!-- News Feed -->
+      <!-- News -->
       <div>
         <div class="section-title">Market News</div>
         <div class="news-feed" id="newsFeed">
-          <div class="empty-state">News will appear once session starts</div>
+          <div class="empty-state">News appears once market is open</div>
         </div>
       </div>
+
     </div>
 
-    <!-- RIGHT: DASHBOARD -->
+    <!-- RIGHT PANEL -->
     <div class="right-panel">
 
-      <!-- Stats Bar -->
+      <!-- Stats -->
       <div class="stat-bar">
         <div class="stat-block">
           <div class="stat-label">Players</div>
           <div class="stat-val accent" id="statPlayers">0</div>
         </div>
         <div class="stat-block">
-          <div class="stat-label">Total Trades</div>
-          <div class="stat-val" id="statTrades">0</div>
+          <div class="stat-label">Active Runs</div>
+          <div class="stat-val" id="statActive">0</div>
         </div>
         <div class="stat-block">
           <div class="stat-label">Top Value</div>
@@ -485,23 +396,23 @@ input::placeholder { color: var(--muted); }
       <div>
         <div class="section-title">Market Overview</div>
         <div class="market-grid" id="marketGrid">
-          <div class="empty-state" style="grid-column:1/-1">Start session to see market data</div>
+          <div class="empty-state" style="grid-column:1/-1">Open market to see prices</div>
+        </div>
+      </div>
+
+      <!-- Players with timers -->
+      <div>
+        <div class="section-title">Player Runs</div>
+        <div class="players-table" id="playersTable">
+          <div class="empty-state">No players yet</div>
         </div>
       </div>
 
       <!-- Leaderboard -->
       <div>
-        <div class="section-title">Live Leaderboard</div>
+        <div class="section-title">Leaderboard</div>
         <div class="lb-table" id="lbTable">
           <div class="empty-state">No players yet</div>
-        </div>
-      </div>
-
-      <!-- Players -->
-      <div>
-        <div class="section-title">Connected Players</div>
-        <div class="players-table" id="playersTable">
-          <div class="empty-state">Waiting for players to join...</div>
         </div>
       </div>
 
@@ -514,24 +425,26 @@ input::placeholder { color: var(--muted); }
 <script>
 const WS_URL = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}`;
 let ws, reconnectTimer;
-let sessionState = null;
+let serverState = 'idle';
 let tickers = [];
 let leaderboard = [];
-let players = {};
 let news = [];
-let timeLeft = 0;
-let timerInterval;
 let authed = false;
 
 const COLORS = ['#00e5a0','#00b8ff','#ffd24d','#ff4466','#a78bfa','#f97316','#ec4899','#84cc16'];
 const MEDALS = ['🥇','🥈','🥉'];
 
+// Live-update run-duration info box
+document.getElementById('cfgRunMins').addEventListener('input', () => {
+  document.getElementById('runMinsDisplay').textContent = document.getElementById('cfgRunMins').value || '10';
+});
+
 // ── AUTH ──
 function authAdmin() {
   const pin = document.getElementById('pinInput').value;
+  sessionStorage.setItem('sf_pin', pin);
   send({ type: 'ADMIN_AUTH', pin });
 }
-
 document.getElementById('pinInput').addEventListener('keydown', e => { if (e.key === 'Enter') authAdmin(); });
 
 // ── WS ──
@@ -553,35 +466,61 @@ function send(obj) {
 
 function handle(msg) {
   switch (msg.type) {
+
     case 'WELCOME':
-      sessionState = msg.session;
+      serverState = msg.serverState;
       tickers = msg.tickers || [];
       leaderboard = msg.leaderboard || [];
-      timeLeft = msg.timeLeft || 0;
-      updateSessionUI();
+      updateServerStateUI();
       renderMarket();
       renderLeaderboard();
+      renderPlayers();
       break;
 
     case 'ADMIN_OK':
       authed = true;
-      sessionState = msg.session;
+      serverState = msg.serverState;
       document.getElementById('pinScreen').style.display = 'none';
       document.getElementById('app').style.display = 'block';
-      updateSessionUI();
+      updateServerStateUI();
       toast('Admin access granted', 'success');
+      // Populate config fields if server has config
+      if (msg.config) {
+        document.getElementById('cfgCash').value = msg.config.startCash || 10000;
+        document.getElementById('cfgRunMins').value = Math.round((msg.config.playerRunSecs || 600) / 60);
+        document.getElementById('cfgVol').value = msg.config.volatility || 3;
+        document.getElementById('cfgSpeed').value = msg.config.priceUpdateSec || 4;
+        document.getElementById('runMinsDisplay').textContent = Math.round((msg.config.playerRunSecs || 600) / 60);
+      }
       break;
 
-    case 'SESSION_STARTED':
-      sessionState = 'running';
-      tickers = msg.tickers;
-      players = {};
+    case 'MARKET_OPENED':
+      serverState = 'open';
+      tickers = msg.tickers || [];
+      updateServerStateUI();
+      renderMarket();
+      toast('Market opened!', 'success');
+      break;
+
+    case 'MARKET_CLOSED':
+      serverState = 'closed';
+      leaderboard = msg.leaderboard;
+      updateServerStateUI();
+      renderLeaderboard();
+      renderPlayers();
+      toast('Market closed — all runs ended', 'success');
+      break;
+
+    case 'MARKET_RESET':
+      serverState = 'idle';
+      tickers = [];
       leaderboard = [];
-      updateSessionUI();
-      startLocalTimer();
+      news = [];
+      updateServerStateUI();
       renderMarket();
       renderLeaderboard();
-      toast('Session launched!', 'success');
+      renderPlayers();
+      toast('Market reset', 'success');
       break;
 
     case 'PRICE_UPDATE':
@@ -596,123 +535,102 @@ function handle(msg) {
 
     case 'LEADERBOARD_UPDATE':
       leaderboard = msg.leaderboard;
-      // Rebuild players map from leaderboard
-      leaderboard.forEach(p => { players[p.id] = p; });
       renderLeaderboard();
       renderPlayers();
       updateStats();
       break;
 
-    case 'TIMER':
-      timeLeft = msg.timeLeft;
-      renderTimer();
-      break;
-
-    case 'SESSION_ENDED':
-      sessionState = 'ended';
-      leaderboard = msg.leaderboard;
-      clearInterval(timerInterval);
-      updateSessionUI();
-      renderLeaderboard();
-      toast('Session ended!', 'success');
-      break;
-
     case 'ERROR':
       toast(msg.text, 'error');
-      if (msg.text === 'Wrong PIN') {
-        document.getElementById('pinError').style.display = 'block';
-      }
+      if (msg.text === 'Wrong PIN') document.getElementById('pinError').style.display = 'block';
       break;
   }
 }
 
-// ── SESSION ──
-function startSession() {
-  const cash = parseInt(document.getElementById('cfgCash').value) || 10000;
-  const dur = parseInt(document.getElementById('cfgDuration').value) || 90;
-  const vol = parseInt(document.getElementById('cfgVol').value) || 3;
-  const spd = parseInt(document.getElementById('cfgSpeed').value) || 4;
-  send({ type: 'ADMIN_START', startCash: cash, durationMins: dur, volatility: vol, priceUpdateSec: spd });
-  timeLeft = dur * 60;
+// ── MARKET CONTROLS ──
+function openMarket() {
+  const cash    = parseInt(document.getElementById('cfgCash').value) || 10000;
+  const runMins = parseInt(document.getElementById('cfgRunMins').value) || 10;
+  const vol     = parseInt(document.getElementById('cfgVol').value) || 3;
+  const spd     = parseInt(document.getElementById('cfgSpeed').value) || 4;
+  send({ type: 'ADMIN_OPEN', startCash: cash, playerRunMins: runMins, volatility: vol, priceUpdateSec: spd });
 }
 
-function endSession() {
-  if (!confirm('End session now? All positions will be liquidated.')) return;
-  send({ type: 'ADMIN_END' });
+function closeMarket() {
+  if (!confirm('Close the market? All active player runs will be force-ended and positions liquidated.')) return;
+  send({ type: 'ADMIN_CLOSE' });
 }
 
-function updateSessionUI() {
-  const dot = document.getElementById('stateDot');
-  const text = document.getElementById('stateText');
-  const startBtn = document.getElementById('startBtn');
-  const endBtn = document.getElementById('endBtn');
+function resetMarket() {
+  if (!confirm('Reset everything? All player data and prices will be wiped.')) return;
+  send({ type: 'ADMIN_RESET' });
+}
 
-  if (sessionState === 'running') {
-    dot.className = 'state-dot state-running';
-    text.textContent = 'Session Running';
-    startBtn.style.display = 'none';
-    endBtn.style.display = 'flex';
-    document.querySelectorAll('#cfgCash,#cfgDuration,#cfgVol,#cfgSpeed').forEach(i => i.disabled = true);
-  } else if (sessionState === 'ended') {
-    dot.className = 'state-dot state-ended';
-    text.textContent = 'Session Ended';
-    startBtn.textContent = '🔄 New Session';
-    startBtn.style.display = 'flex';
-    endBtn.style.display = 'none';
-    document.getElementById('bigTimer').className = 'big-timer-val idle';
-    document.getElementById('bigTimer').textContent = 'Done';
-    document.querySelectorAll('#cfgCash,#cfgDuration,#cfgVol,#cfgSpeed').forEach(i => i.disabled = false);
+function kickPlayer(playerId, name) {
+  if (!confirm(`End ${name}'s run now?`)) return;
+  send({ type: 'ADMIN_KICK', playerId });
+}
+
+// ── SERVER STATE UI ──
+function updateServerStateUI() {
+  const pill = document.getElementById('marketStatePill');
+  const dot  = document.getElementById('marketStateDot');
+  const text = document.getElementById('marketStateText');
+  const openBtn  = document.getElementById('openBtn');
+  const closeBtn = document.getElementById('closeBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const inputs   = document.querySelectorAll('#cfgCash,#cfgRunMins,#cfgVol,#cfgSpeed');
+
+  pill.className = 'market-state-pill ' + serverState;
+
+  if (serverState === 'open') {
+    dot.classList.add('blink');
+    text.textContent = 'Market Open';
+    openBtn.style.display = 'none';
+    closeBtn.style.display = 'flex';
+    resetBtn.style.display = 'none';
+    inputs.forEach(i => i.disabled = true);
+  } else if (serverState === 'closed') {
+    dot.classList.remove('blink');
+    text.textContent = 'Market Closed';
+    openBtn.style.display = 'flex';
+    openBtn.textContent = '🔄 Re-open Market';
+    closeBtn.style.display = 'none';
+    resetBtn.style.display = 'flex';
+    inputs.forEach(i => i.disabled = false);
   } else {
-    dot.className = 'state-dot state-waiting';
-    text.textContent = 'Waiting to Start';
-    startBtn.style.display = 'flex';
-    endBtn.style.display = 'none';
-    document.getElementById('bigTimer').className = 'big-timer-val idle';
-    document.getElementById('bigTimer').textContent = '--:--';
+    dot.classList.remove('blink');
+    text.textContent = 'Idle';
+    openBtn.style.display = 'flex';
+    openBtn.textContent = '🚀 Open Market';
+    closeBtn.style.display = 'none';
+    resetBtn.style.display = 'none';
+    inputs.forEach(i => i.disabled = false);
   }
-}
-
-// ── TIMER ──
-function startLocalTimer() {
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    if (timeLeft > 0 && sessionState === 'running') { timeLeft--; renderTimer(); }
-  }, 1000);
-}
-
-function renderTimer() {
-  const m = Math.floor(timeLeft / 60);
-  const s = timeLeft % 60;
-  const el = document.getElementById('bigTimer');
-  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  el.className = 'big-timer-val' + (timeLeft <= 60 && timeLeft > 0 ? ' urgent' : '');
 }
 
 // ── MARKET ──
 function renderMarket() {
-  if (!tickers.length) return;
+  if (!tickers.length) {
+    document.getElementById('marketGrid').innerHTML = '<div class="empty-state" style="grid-column:1/-1">Open market to see prices</div>';
+    return;
+  }
   document.getElementById('marketGrid').innerHTML = tickers.map(t => {
     const up = t.price >= t.prevPrice;
-    return `
-      <div class="market-card">
-        <div class="mc-top">
-          <div>
-            <div class="mc-sym">${t.symbol}</div>
-            <div class="mc-name">${t.name}</div>
-          </div>
-          <div class="mc-badge ${up ? 'badge-up' : 'badge-down'}">${up ? '+' : ''}${t.changePct.toFixed(2)}%</div>
-        </div>
-        <div class="mc-price" style="color:${up ? 'var(--green)' : 'var(--red)'}">$${t.price.toFixed(2)}</div>
-        ${sparkline(t.history, up)}
+    return `<div class="market-card">
+      <div class="mc-top">
+        <div><div class="mc-sym">${t.symbol}</div><div class="mc-name">${t.name}</div></div>
+        <div class="mc-badge ${up ? 'badge-up' : 'badge-down'}">${up ? '+' : ''}${t.changePct.toFixed(2)}%</div>
       </div>
-    `;
+      <div class="mc-price" style="color:${up ? 'var(--green)' : 'var(--red)'}">$${t.price.toFixed(2)}</div>
+      ${sparkline(t.history, up)}
+    </div>`;
   }).join('');
 }
 
 function sparkline(history, up) {
   if (!history || history.length < 2) return '';
-  const min = Math.min(...history), max = Math.max(...history);
-  const range = max - min || 1;
+  const min = Math.min(...history), max = Math.max(...history), range = max - min || 1;
   const w = 200, h = 32;
   const pts = history.map((v, i) => {
     const x = (i / (history.length - 1)) * w;
@@ -732,6 +650,34 @@ function sparkline(history, up) {
   </svg>`;
 }
 
+// ── PLAYERS ──
+function renderPlayers() {
+  const list = leaderboard; // leaderboard has all player data including runState/timeLeft
+  if (!list.length) {
+    document.getElementById('playersTable').innerHTML = '<div class="empty-state">No players yet</div>';
+    return;
+  }
+
+  document.getElementById('playersTable').innerHTML = list.map((p, i) => {
+    const runDone = p.runState === 'ended';
+    const t = p.timeLeft || 0;
+    const m = Math.floor(t / 60), s = t % 60;
+    const timeStr = runDone ? 'Done' : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    const timerClass = runDone ? 'done' : (t <= 30 && t > 0 ? 'urgent' : '');
+    const up = p.pnl >= 0;
+
+    return `<div class="player-row ${runDone ? 'ended-run' : 'active-run'}">
+      <div class="p-avatar" style="background:linear-gradient(135deg,${COLORS[i%COLORS.length]},${COLORS[(i+1)%COLORS.length]})">${p.name[0].toUpperCase()}</div>
+      <div class="p-name">${p.name}</div>
+      <div class="p-timer ${timerClass}">${timeStr}</div>
+      <div class="p-pnl ${up ? 'pnl-pos' : 'pnl-neg'}">${up?'+':''}$${p.pnl.toFixed(0)}</div>
+      ${!runDone && serverState === 'open'
+        ? `<div class="p-kick" onclick="kickPlayer('${p.id}','${p.name.replace(/'/g, "\\'")}')">End</div>`
+        : ''}
+    </div>`;
+  }).join('');
+}
+
 // ── LEADERBOARD ──
 function renderLeaderboard() {
   if (!leaderboard.length) {
@@ -741,56 +687,40 @@ function renderLeaderboard() {
   document.getElementById('lbTable').innerHTML = leaderboard.map((p, i) => {
     const up = p.pnl >= 0;
     const color = COLORS[i % COLORS.length];
-    return `
-      <div class="lb-row">
-        <div class="lb-rank" style="color:${i<3?['#ffd24d','#c0c8d8','#cd8f52'][i]:'var(--muted)'}">${MEDALS[i]||i+1}</div>
-        <div class="lb-av" style="background:linear-gradient(135deg,${color},${COLORS[(i+2)%COLORS.length]})">${p.name[0].toUpperCase()}</div>
-        <div class="lb-info">
-          <div class="lb-name">${p.name}</div>
-          <div class="lb-sub">${p.trades} trades · $${p.cash.toFixed(0)} cash</div>
-        </div>
-        <div class="lb-val">
-          <div class="lb-total">$${p.total.toFixed(2)}</div>
-          <div class="lb-pnl ${up ? 'pnl-pos' : 'pnl-neg'}">${up?'+':''}$${p.pnl.toFixed(2)} (${up?'+':''}${p.pnlPct.toFixed(2)}%)</div>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
+    const runDone = p.runState === 'ended';
+    const t = p.timeLeft || 0;
+    const timeStr = runDone
+      ? '✓ Run ended'
+      : `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')} left`;
 
-// ── PLAYERS ──
-function renderPlayers() {
-  const list = Object.values(players);
-  if (!list.length) {
-    document.getElementById('playersTable').innerHTML = '<div class="empty-state">Waiting for players to join...</div>';
-    return;
-  }
-  document.getElementById('playersTable').innerHTML = list.map((p, i) => `
-    <div class="player-row">
-      <div class="p-avatar" style="background:linear-gradient(135deg,${COLORS[i%COLORS.length]},${COLORS[(i+1)%COLORS.length]})">${p.name[0].toUpperCase()}</div>
-      <div class="p-name">${p.name}</div>
-      <div class="p-cash">$${p.cash.toFixed(0)}</div>
-      <div class="p-trades">${p.trades}t</div>
-    </div>
-  `).join('');
+    return `<div class="lb-row ${runDone ? 'ended' : ''}">
+      <div class="lb-rank" style="color:${i<3?['#ffd24d','#c0c8d8','#cd8f52'][i]:'var(--muted)'}">${MEDALS[i]||i+1}</div>
+      <div class="lb-av" style="background:linear-gradient(135deg,${color},${COLORS[(i+2)%COLORS.length]})">${p.name[0].toUpperCase()}</div>
+      <div class="lb-info">
+        <div class="lb-name">${p.name}</div>
+        <div class="lb-sub">${p.trades} trades · ${timeStr}</div>
+      </div>
+      <div class="lb-val">
+        <div class="lb-total">$${p.total.toFixed(2)}</div>
+        <div class="lb-pnl ${up ? 'pnl-pos' : 'pnl-neg'}">${up?'+':''}$${p.pnl.toFixed(2)} (${up?'+':''}${p.pnlPct.toFixed(2)}%)</div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ── NEWS ──
 function renderNews() {
   if (!news.length) return;
-  document.getElementById('newsFeed').innerHTML = news.map(n => `
-    <div class="news-item">
-      <span class="news-icon">📰</span>
-      <span>${n.text}</span>
-    </div>
-  `).join('');
+  document.getElementById('newsFeed').innerHTML = news.map(n =>
+    `<div class="news-item ${n.sentiment || 'neutral'}">${n.text}</div>`
+  ).join('');
 }
 
 // ── STATS ──
 function updateStats() {
   document.getElementById('statPlayers').textContent = leaderboard.length;
-  const totalTrades = leaderboard.reduce((s, p) => s + p.trades, 0);
-  document.getElementById('statTrades').textContent = totalTrades;
+  const active = leaderboard.filter(p => p.runState === 'active').length;
+  document.getElementById('statActive').textContent = active;
   if (leaderboard.length) {
     document.getElementById('statTop').textContent = '$' + leaderboard[0].total.toFixed(0);
     const avgPnl = leaderboard.reduce((s, p) => s + p.pnl, 0) / leaderboard.length;
