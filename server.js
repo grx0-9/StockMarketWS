@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// GAME STATE
+// STOCKS & NEWS
 // ─────────────────────────────────────────────
 const STOCKS = [
   { symbol: 'APEX',  name: 'Apex Tech Inc.',       base: 142.50, sector: 'Tech' },
@@ -28,34 +28,72 @@ const STOCKS = [
 ];
 
 const NEWS_TEMPLATES = [
-  s => `${s} Q3 earnings beat analyst expectations by 12%`,
-  s => `${s} announces major partnership deal`,
-  s => `${s} faces regulatory scrutiny — shares volatile`,
-  s => `${s} CEO steps down — board appoints interim leader`,
-  s => `${s} expands into Asian markets, bullish outlook`,
-  s => `Analysts upgrade ${s} to "Strong Buy"`,
-  s => `${s} misses revenue targets for second quarter`,
-  s => `${s} stock hits 52-week high amid market rally`,
-  s => `Breaking: ${s} announces $2B share buyback program`,
-  s => `${s} faces supply chain disruptions — guidance lowered`,
-  s => `${s} patents new technology, shares surge`,
-  s => `${s} reports record user growth`,
+  // BULLISH — strong
+  { text: s => `🚀 ${s} Q3 earnings crush estimates — revenue up 34% YoY`,           impact:  0.045 },
+  { text: s => `📈 ${s} wins landmark $4B government contract`,                        impact:  0.055 },
+  { text: s => `💊 ${s} FDA approves breakthrough treatment — analysts ecstatic`,      impact:  0.065 },
+  { text: s => `🤝 ${s} merger talks confirmed — premium buyout expected`,              impact:  0.070 },
+  { text: s => `🏆 ${s} named to S&P 500 index — passive fund buying incoming`,        impact:  0.050 },
+  { text: s => `💰 ${s} announces $2B share buyback program`,                          impact:  0.035 },
+  { text: s => `🌏 ${s} expands into Asian markets — TAM doubles overnight`,           impact:  0.040 },
+  { text: s => `⚡ ${s} patents revolutionary technology — licensing deals imminent`,   impact:  0.060 },
+  { text: s => `📊 Analysts upgrade ${s} to "Strong Buy" — price target raised 40%`,  impact:  0.042 },
+  { text: s => `🛢️ ${s} discovers major new resource deposit`,                         impact:  0.058 },
+  // BULLISH — moderate
+  { text: s => `📰 ${s} reports record user growth for third consecutive quarter`,     impact:  0.022 },
+  { text: s => `🤝 ${s} signs strategic partnership with Fortune 500 firm`,            impact:  0.028 },
+  { text: s => `💵 ${s} raises full-year guidance citing strong demand`,               impact:  0.030 },
+  { text: s => `🧑‍💼 ${s} appoints celebrated industry veteran as new CEO`,            impact:  0.018 },
+  { text: s => `🔬 ${s} Phase 3 trial shows promising results`,                        impact:  0.025 },
+  { text: s => `🌱 ${s} secures $800M green energy transition fund`,                   impact:  0.020 },
+  // BEARISH — strong
+  { text: s => `💥 ${s} misses earnings — revenue down 18%, guidance slashed`,         impact: -0.052 },
+  { text: s => `⚖️ ${s} hit with massive antitrust lawsuit — DOJ investigation opens`, impact: -0.060 },
+  { text: s => `🚨 ${s} CEO arrested on securities fraud charges`,                     impact: -0.075 },
+  { text: s => `📉 ${s} recalls flagship product — safety investigation underway`,     impact: -0.055 },
+  { text: s => `🏦 ${s} discloses accounting irregularities — audit committee formed`, impact: -0.068 },
+  { text: s => `💔 ${s} loses exclusive contract worth $3B annually`,                  impact: -0.050 },
+  { text: s => `🌊 ${s} faces class-action lawsuit from shareholders`,                 impact: -0.040 },
+  { text: s => `📉 Analysts downgrade ${s} to "Sell" — slashes price target 35%`,     impact: -0.038 },
+  // BEARISH — moderate
+  { text: s => `⚠️ ${s} warns of supply chain disruptions — margin compression ahead`, impact: -0.025 },
+  { text: s => `🚪 ${s} CFO unexpectedly resigns — no successor named`,                impact: -0.022 },
+  { text: s => `🏭 ${s} shuts down key facility amid safety concerns`,                 impact: -0.030 },
+  { text: s => `🌧️ ${s} lowers full-year revenue outlook citing macro headwinds`,      impact: -0.028 },
+  { text: s => `📦 ${s} inventory builds to 3-year high — demand slowdown feared`,    impact: -0.020 },
+  // NEUTRAL
+  { text: s => `❓ ${s} in takeover talks — outcome uncertain, shares swing wildly`,   impact:  0.000 },
+  { text: s => `🗳️ ${s} faces shareholder vote on controversial restructuring plan`,   impact:  0.000 },
 ];
 
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+/*
+  serverState:
+    'idle'   — not started yet; no market ticking
+    'open'   — market is live; players can join and get their personal countdown
+    'closed' — admin shut the market; no new joins, remaining active players are liquidated
+
+  Each player has their own run:
+    runState: 'active' | 'ended'
+    timeLeft: personal seconds remaining
+    When timeLeft hits 0 → holdings liquidated, runState = 'ended'
+    Ended players can still view prices/leaderboard but cannot trade.
+*/
 let state = {
-  session: null,   // null = not started, 'running' = active, 'ended' = over
+  serverState: 'idle',
   config: {
     startCash: 10000,
-    roundDuration: 90 * 60, // 90 minutes in seconds
+    playerRunSecs: 10 * 60,  // default: 10 min per player
     volatility: 3,
     priceUpdateSec: 4,
   },
   tickers: [],
-  players: {},     // playerId -> player object
-  leaderboard: [], // sorted by total value, updated on every trade/price tick
+  players: {},             // id -> player object
+  allTimeLeaderboard: [],  // sorted by total value; includes ended players
   news: [],
-  timeLeft: 0,
-  startedAt: null,
+  openedAt: null,
 };
 
 function initTickers() {
@@ -66,18 +104,22 @@ function initTickers() {
     history: Array(20).fill(s.base),
     change: 0,
     changePct: 0,
+    newsImpact: 0,
   }));
 }
 
 function makePlayer(name) {
   return {
-    id: Date.now() + Math.random().toString(36).slice(2),
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2),
     name,
     cash: state.config.startCash,
     startCash: state.config.startCash,
-    holdings: {},   // symbol -> qty
+    holdings: {},
     joinedAt: Date.now(),
     trades: 0,
+    runState: 'active',
+    timeLeft: state.config.playerRunSecs,
+    runEndedAt: null,
   };
 }
 
@@ -85,7 +127,7 @@ function makePlayer(name) {
 // PRICE ENGINE
 // ─────────────────────────────────────────────
 let priceTimer = null;
-let gameTimer = null;
+let playerTickTimer = null;
 
 function updatePrices() {
   const vol = state.config.volatility;
@@ -93,28 +135,84 @@ function updatePrices() {
     t.prevPrice = t.price;
     const drift = (t.base - t.price) * 0.008;
     const shock = (Math.random() - 0.5) * 2 * vol * (t.price * 0.018);
-    t.price = Math.max(0.50, t.price + drift + shock);
+    const newsNudge = t.newsImpact * t.price;
+    t.newsImpact *= 0.70;
+    if (Math.abs(t.newsImpact) < 0.0001) t.newsImpact = 0;
+    t.price = Math.max(0.50, t.price + drift + shock + newsNudge);
     t.change = t.price - t.prevPrice;
     t.changePct = (t.change / t.prevPrice) * 100;
     t.history.push(parseFloat(t.price.toFixed(2)));
     if (t.history.length > 40) t.history.shift();
   });
 
-  // Random news burst
+  // Random news event
   if (Math.random() < 0.25) {
     const t = state.tickers[Math.floor(Math.random() * state.tickers.length)];
-    const tmpl = NEWS_TEMPLATES[Math.floor(Math.random() * NEWS_TEMPLATES.length)];
-    state.news.unshift({ text: tmpl(t.symbol), ts: Date.now() });
+    const template = NEWS_TEMPLATES[Math.floor(Math.random() * NEWS_TEMPLATES.length)];
+    t.newsImpact += template.impact;
+    let sentiment = 'neutral';
+    if (template.impact > 0.01) sentiment = 'bullish';
+    else if (template.impact < -0.01) sentiment = 'bearish';
+    state.news.unshift({ text: template.text(t.symbol), ts: Date.now(), symbol: t.symbol, sentiment });
     if (state.news.length > 30) state.news.pop();
   }
 
   rebuildLeaderboard();
-  broadcast({ type: 'PRICE_UPDATE', tickers: state.tickers, leaderboard: state.leaderboard, news: state.news.slice(0, 8) });
+  broadcast({
+    type: 'PRICE_UPDATE',
+    tickers: state.tickers,
+    leaderboard: state.allTimeLeaderboard,
+    news: state.news.slice(0, 8),
+  });
+}
+
+// Ticks every second — decrements each active player's personal timer
+function tickPlayerTimers() {
+  let changed = false;
+  Object.values(state.players).forEach(p => {
+    if (p.runState !== 'active') return;
+    p.timeLeft = Math.max(0, p.timeLeft - 1);
+    changed = true;
+
+    // Push personal timer to that player's socket only
+    const sock = findSocketForPlayer(p.id);
+    if (sock) sendTo(sock, { type: 'PLAYER_TIMER', timeLeft: p.timeLeft });
+
+    if (p.timeLeft <= 0) endPlayerRun(p);
+  });
+
+  // Broadcast leaderboard so admin sees updated timeLeft values
+  if (changed) {
+    rebuildLeaderboard();
+    broadcast({ type: 'LEADERBOARD_UPDATE', leaderboard: state.allTimeLeaderboard });
+  }
+}
+
+function endPlayerRun(player) {
+  // Liquidate all open positions at current market price
+  Object.entries(player.holdings).forEach(([sym, qty]) => {
+    const t = state.tickers.find(t => t.symbol === sym);
+    if (t) player.cash += t.price * qty;
+  });
+  player.holdings = {};
+  player.runState = 'ended';
+  player.runEndedAt = Date.now();
+
+  rebuildLeaderboard();
+
+  const sock = findSocketForPlayer(player.id);
+  if (sock) {
+    sendTo(sock, {
+      type: 'RUN_ENDED',
+      player: sanitizePlayer(player),
+      leaderboard: state.allTimeLeaderboard,
+    });
+  }
+  broadcast({ type: 'LEADERBOARD_UPDATE', leaderboard: state.allTimeLeaderboard });
 }
 
 function rebuildLeaderboard() {
-  const players = Object.values(state.players);
-  state.leaderboard = players.map(p => {
+  state.allTimeLeaderboard = Object.values(state.players).map(p => {
     const investedVal = Object.entries(p.holdings).reduce((sum, [sym, qty]) => {
       const t = state.tickers.find(t => t.symbol === sym);
       return sum + (t ? t.price * qty : 0);
@@ -131,45 +229,59 @@ function rebuildLeaderboard() {
       pnlPct: parseFloat(((pnl / p.startCash) * 100).toFixed(2)),
       trades: p.trades,
       joinedAt: p.joinedAt,
+      runState: p.runState,
+      timeLeft: p.timeLeft,
     };
   }).sort((a, b) => b.total - a.total);
 }
 
-function startGameTimers() {
-  priceTimer = setInterval(updatePrices, state.config.priceUpdateSec * 1000);
-
-  gameTimer = setInterval(() => {
-    state.timeLeft = Math.max(0, state.config.roundDuration - Math.floor((Date.now() - state.startedAt) / 1000));
-    broadcast({ type: 'TIMER', timeLeft: state.timeLeft });
-
-    if (state.timeLeft <= 0) {
-      endSession();
-    }
-  }, 1000);
+function sanitizePlayer(p) {
+  return {
+    id: p.id,
+    name: p.name,
+    cash: p.cash,
+    holdings: p.holdings,
+    startCash: p.startCash,
+    trades: p.trades,
+    runState: p.runState,
+    timeLeft: p.timeLeft,
+  };
 }
 
-function endSession() {
+function startMarket() {
+  priceTimer = setInterval(updatePrices, state.config.priceUpdateSec * 1000);
+  playerTickTimer = setInterval(tickPlayerTimers, 1000);
+}
+
+function stopTimers() {
   clearInterval(priceTimer);
-  clearInterval(gameTimer);
-  state.session = 'ended';
+  clearInterval(playerTickTimer);
+  priceTimer = null;
+  playerTickTimer = null;
+}
 
-  // Liquidate all holdings
+function closeMarket() {
+  stopTimers();
+  // Force-end any still-active players
   Object.values(state.players).forEach(p => {
-    Object.entries(p.holdings).forEach(([sym, qty]) => {
-      const t = state.tickers.find(t => t.symbol === sym);
-      if (t) p.cash += t.price * qty;
-    });
-    p.holdings = {};
+    if (p.runState === 'active') endPlayerRun(p);
   });
-
+  state.serverState = 'closed';
   rebuildLeaderboard();
-  broadcast({ type: 'SESSION_ENDED', leaderboard: state.leaderboard });
+  broadcast({ type: 'MARKET_CLOSED', leaderboard: state.allTimeLeaderboard });
 }
 
 // ─────────────────────────────────────────────
-// WEBSOCKET
+// WEBSOCKET LAYER
 // ─────────────────────────────────────────────
 const clients = new Map(); // ws -> { playerId, isAdmin }
+
+function findSocketForPlayer(playerId) {
+  for (const [ws, ctx] of clients.entries()) {
+    if (ctx.playerId === playerId) return ws;
+  }
+  return null;
+}
 
 function broadcast(msg) {
   const data = JSON.stringify(msg);
@@ -179,20 +291,20 @@ function broadcast(msg) {
 }
 
 function sendTo(ws, msg) {
-  if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(msg));
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(msg));
 }
 
 wss.on('connection', ws => {
   clients.set(ws, { playerId: null, isAdmin: false });
 
+  // Welcome packet — enough for client to decide what screen to show
   sendTo(ws, {
     type: 'WELCOME',
-    session: state.session,
+    serverState: state.serverState,
     config: state.config,
     tickers: state.tickers,
-    leaderboard: state.leaderboard,
+    leaderboard: state.allTimeLeaderboard,
     news: state.news.slice(0, 8),
-    timeLeft: state.timeLeft,
   });
 
   ws.on('message', raw => {
@@ -202,87 +314,124 @@ wss.on('connection', ws => {
 
     switch (msg.type) {
 
-      // ── ADMIN ──────────────────────────────
-      case 'ADMIN_START': {
-        if (state.session === 'running') {
-          sendTo(ws, { type: 'ERROR', text: 'Session already running' }); return;
-        }
-        state.config = {
-          startCash: msg.startCash || 10000,
-          roundDuration: (msg.durationMins || 90) * 60,
-          volatility: msg.volatility || 3,
-          priceUpdateSec: msg.priceUpdateSec || 4,
-        };
-        state.players = {};
-        state.leaderboard = [];
-        state.news = [];
-        initTickers();
-        state.session = 'running';
-        state.startedAt = Date.now();
-        state.timeLeft = state.config.roundDuration;
-        ctx.isAdmin = true;
-        startGameTimers();
-        broadcast({ type: 'SESSION_STARTED', config: state.config, tickers: state.tickers });
-        break;
-      }
-
-      case 'ADMIN_END': {
-        if (state.session === 'running') endSession();
-        break;
-      }
-
-      case 'ADMIN_CONFIG': {
-        if (state.session !== 'running') {
-          state.config = { ...state.config, ...msg.config };
-          sendTo(ws, { type: 'CONFIG_UPDATED', config: state.config });
-        }
-        break;
-      }
-
+      // ─── ADMIN ──────────────────────────────────────
       case 'ADMIN_AUTH': {
-        // Simple pin auth
         if (msg.pin === (process.env.ADMIN_PIN || '1234')) {
           ctx.isAdmin = true;
-          sendTo(ws, { type: 'ADMIN_OK', session: state.session, config: state.config });
+          sendTo(ws, {
+            type: 'ADMIN_OK',
+            serverState: state.serverState,
+            config: state.config,
+            players: Object.values(state.players).map(sanitizePlayer),
+          });
         } else {
           sendTo(ws, { type: 'ERROR', text: 'Wrong PIN' });
         }
         break;
       }
 
-      // ── PLAYER ─────────────────────────────
+      case 'ADMIN_OPEN': {
+        if (!ctx.isAdmin) return;
+        if (state.serverState === 'open') {
+          sendTo(ws, { type: 'ERROR', text: 'Market already open' }); return;
+        }
+        state.config = {
+          startCash:      msg.startCash      || 10000,
+          playerRunSecs:  (msg.playerRunMins || 10) * 60,
+          volatility:     msg.volatility     || 3,
+          priceUpdateSec: msg.priceUpdateSec || 4,
+        };
+        // Full reset if idle or admin requested it
+        if (state.serverState === 'idle' || msg.reset) {
+          state.players = {};
+          state.allTimeLeaderboard = [];
+          state.news = [];
+          initTickers();
+        }
+        state.serverState = 'open';
+        state.openedAt = Date.now();
+        startMarket();
+        broadcast({
+          type: 'MARKET_OPENED',
+          serverState: 'open',
+          config: state.config,
+          tickers: state.tickers,
+        });
+        break;
+      }
+
+      case 'ADMIN_CLOSE': {
+        if (!ctx.isAdmin) return;
+        if (state.serverState !== 'open') {
+          sendTo(ws, { type: 'ERROR', text: 'Market is not open' }); return;
+        }
+        closeMarket();
+        break;
+      }
+
+      case 'ADMIN_RESET': {
+        if (!ctx.isAdmin) return;
+        stopTimers();
+        state.players = {};
+        state.allTimeLeaderboard = [];
+        state.news = [];
+        state.tickers = [];
+        state.serverState = 'idle';
+        state.openedAt = null;
+        broadcast({ type: 'MARKET_RESET', serverState: 'idle' });
+        break;
+      }
+
+      case 'ADMIN_KICK': {
+        if (!ctx.isAdmin) return;
+        const target = state.players[msg.playerId];
+        if (target && target.runState === 'active') endPlayerRun(target);
+        break;
+      }
+
+      // ─── PLAYER ─────────────────────────────────────
       case 'JOIN': {
-        if (state.session !== 'running') {
-          sendTo(ws, { type: 'ERROR', text: 'No active session. Ask your admin to start the game!' }); return;
+        if (state.serverState !== 'open') {
+          sendTo(ws, { type: 'ERROR', text: 'The market is not open right now.' }); return;
         }
         const name = (msg.name || '').trim().slice(0, 20);
         if (!name) { sendTo(ws, { type: 'ERROR', text: 'Enter a name' }); return; }
 
-        // Allow rejoin by name
-        let player = Object.values(state.players).find(p => p.name.toLowerCase() === name.toLowerCase());
-        if (!player) {
+        // Allow reconnect by name
+        let player = Object.values(state.players).find(
+          p => p.name.toLowerCase() === name.toLowerCase()
+        );
+
+        if (player) {
+          // Reconnect — just re-associate this socket
+          ctx.playerId = player.id;
+        } else {
           player = makePlayer(name);
           state.players[player.id] = player;
+          ctx.playerId = player.id;
         }
-        ctx.playerId = player.id;
 
         rebuildLeaderboard();
         sendTo(ws, {
           type: 'JOINED',
-          player: { id: player.id, name: player.name, cash: player.cash, holdings: player.holdings, startCash: player.startCash, trades: player.trades },
+          player: sanitizePlayer(player),
           tickers: state.tickers,
-          leaderboard: state.leaderboard,
-          timeLeft: state.timeLeft,
+          leaderboard: state.allTimeLeaderboard,
           news: state.news.slice(0, 8),
         });
-        broadcast({ type: 'LEADERBOARD_UPDATE', leaderboard: state.leaderboard });
+        broadcast({ type: 'LEADERBOARD_UPDATE', leaderboard: state.allTimeLeaderboard });
         break;
       }
 
       case 'TRADE': {
-        if (state.session !== 'running') { sendTo(ws, { type: 'ERROR', text: 'Session not active' }); return; }
+        if (state.serverState !== 'open') {
+          sendTo(ws, { type: 'ERROR', text: 'Market is closed' }); return;
+        }
         const player = state.players[ctx.playerId];
         if (!player) { sendTo(ws, { type: 'ERROR', text: 'Not joined' }); return; }
+        if (player.runState !== 'active') {
+          sendTo(ws, { type: 'ERROR', text: 'Your run has ended — no more trades!' }); return;
+        }
 
         const { symbol, side, qty } = msg;
         const q = Math.max(1, parseInt(qty) || 1);
@@ -309,9 +458,9 @@ wss.on('connection', ws => {
         sendTo(ws, {
           type: 'TRADE_OK',
           side, symbol, qty: q, price: ticker.price, total: cost,
-          player: { cash: player.cash, holdings: player.holdings, trades: player.trades },
+          player: sanitizePlayer(player),
         });
-        broadcast({ type: 'LEADERBOARD_UPDATE', leaderboard: state.leaderboard });
+        broadcast({ type: 'LEADERBOARD_UPDATE', leaderboard: state.allTimeLeaderboard });
         break;
       }
 
@@ -323,15 +472,15 @@ wss.on('connection', ws => {
 });
 
 // ─────────────────────────────────────────────
-// REST ROUTES (for initial page loads)
+// REST
 // ─────────────────────────────────────────────
 app.get('/api/state', (req, res) => {
   res.json({
-    session: state.session,
-    leaderboard: state.leaderboard,
+    serverState: state.serverState,
+    leaderboard: state.allTimeLeaderboard,
     tickers: state.tickers,
-    timeLeft: state.timeLeft,
     news: state.news.slice(0, 8),
+    config: state.config,
   });
 });
 
