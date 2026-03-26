@@ -654,7 +654,8 @@ body {
 
   <!-- MARKET TAB -->
   <div class="tab-content active" id="tab-content-market">
-    <div class="market-list" id="marketList"></div>
+    <div id="newsFeed" style="padding:10px 12px;font-family:var(--mono);font-size:11px;color:var(--yellow);"></div>
+<div class="market-list" id="marketList"></div>
   </div>
 
   <!-- PORTFOLIO TAB -->
@@ -717,6 +718,7 @@ let ws, reconnectTimer;
 let myPlayer = null; // { id, name, cash, holdings, startCash, trades }
 let tickers = [];
 let leaderboard = [];
+  let news = [];
 let timeLeft = 0;
 let timerInterval;
 let selectedSymbol = null;
@@ -781,13 +783,15 @@ function handle(msg) {
       break;
 
     case 'PRICE_UPDATE':
-      tickers = msg.tickers;
-      leaderboard = msg.leaderboard;
-      renderMarket();
-      renderLeaderboard();
-      updateStrip();
-      updateDrawerPrice();
-      break;
+  tickers = msg.tickers;
+  leaderboard = msg.leaderboard;
+  news = msg.news || [];
+  renderNews();
+  renderMarket();
+  renderLeaderboard();
+  updateStrip();
+  updateDrawerPrice();
+  break;
 
     case 'LEADERBOARD_UPDATE':
       leaderboard = msg.leaderboard;
@@ -920,6 +924,7 @@ function renderAll() {
   renderLeaderboard();
   updateStrip();
   renderTimer();
+  renderNews();
 }
 
 // ── MARKET ──
@@ -1129,6 +1134,15 @@ function toast(msg, type = 'success') {
   document.getElementById('toasts').appendChild(el);
   setTimeout(() => { el.style.animation = 'tOut 0.25s ease forwards'; setTimeout(() => el.remove(), 250); }, 2500);
 }
+
+function renderNews() {
+  const el = document.getElementById('newsFeed');
+  if (!el) return;
+
+  el.innerHTML = news.map(n => `📰 ${n.text}`).join('<br>');
+}
+
+
 
 // ── KEYBOARD ──
 document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') join(); });
