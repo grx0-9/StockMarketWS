@@ -182,8 +182,11 @@ body {
 .stock-row.selected { border-color: var(--accent); }
 /* Dim stock rows when run has ended */
 .stock-row.run-over { opacity: 0.5; cursor: default; pointer-events: none; }
+.stock-left { min-width: 0; }
 .stock-sym { font-family: var(--mono); font-size: 16px; font-weight: 700; min-width: 52px; }
 .stock-name { font-size: 11px; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+.held-chip { margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); background: rgba(0,229,160,0.1); border: 1px solid rgba(0,229,160,0.25); border-radius: 999px; padding: 2px 8px; }
+.held-count { font-size: 13px; font-weight: 800; color: var(--text); }
 .stock-meta-pnl.pos { color: var(--green); }
 .stock-meta-pnl.neg { color: var(--red); }
 .stock-chart { flex: 1; }
@@ -304,7 +307,9 @@ body {
   body.compact-market .stock-name { max-width: 170px; }
   .topbar { padding: 10px 12px 8px; }
   .stock-row { padding: 12px; gap: 8px; }
-  .stock-name { max-width: 115px; font-size: 10px; }
+  .stock-name { max-width: 130px; font-size: 10px; }
+  .held-chip { font-size: 10px; padding: 2px 7px; }
+  .held-count { font-size: 14px; }
   .stock-price { font-size: 14px; }
   .stock-pct { font-size: 10px; }
   .player-badge { max-width: 84px; font-size: 12px; }
@@ -774,10 +779,11 @@ function renderMarket() {
     return `
       <div class="stock-row ${selectedSymbol === t.symbol ? 'selected' : ''} ${runOver ? 'run-over' : ''}"
            onclick="${runOver ? '' : `openDrawer('${t.symbol}')`}">
-        <div>
+        <div class="stock-left">
           <div class="stock-sym">${t.symbol}</div>
+          <div class="held-chip">HELD <span class="held-count">${owned}</span></div>
           <div class="stock-name">
-            ${t.name} · # held ${owned}${posPctStr ? ` · <span class="stock-meta-pnl ${posPctClass}">P&L ${posPctStr}</span>` : ''}
+            ${t.name}${posPctStr ? ` · <span class="stock-meta-pnl ${posPctClass}">P&L ${posPctStr}</span>` : ''}
           </div>
         </div>
         <div class="stock-chart">${sparkline(t.history, up)}</div>
