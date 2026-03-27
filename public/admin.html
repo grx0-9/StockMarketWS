@@ -278,6 +278,59 @@ input:disabled { opacity: 0.4; cursor: not-allowed; }
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+@media (max-width: 980px) {
+  .admin-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+  .conn-status {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .admin-body {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .left-panel {
+    position: static;
+    top: auto;
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 16px;
+  }
+  .right-panel {
+    padding: 16px;
+  }
+  .stat-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .market-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .pin-card {
+    margin: 0 14px;
+    padding: 26px 18px;
+    border-radius: 16px;
+  }
+  .admin-logo { font-size: 12px; }
+  .admin-badge { font-size: 9px; letter-spacing: 1px; }
+  .market-state-pill { font-size: 11px; padding: 4px 10px; }
+  .section-title { margin-bottom: 10px; }
+  .stat-val { font-size: 20px; }
+  .player-row, .lb-row {
+    padding: 10px 10px;
+    gap: 8px;
+  }
+  .p-name, .lb-name { font-size: 13px; }
+  .p-pnl, .lb-pnl, .lb-sub { font-size: 10px; }
+}
 </style>
 </head>
 <body>
