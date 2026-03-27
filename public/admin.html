@@ -464,6 +464,15 @@ function send(obj) {
   if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj));
 }
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function handle(msg) {
   switch (msg.type) {
 
@@ -665,10 +674,12 @@ function renderPlayers() {
     const timeStr = runDone ? 'Done' : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     const timerClass = runDone ? 'done' : (t <= 30 && t > 0 ? 'urgent' : '');
     const up = p.pnl >= 0;
+    const safeName = escapeHtml(p.name);
+    const avatarChar = escapeHtml((p.name && p.name[0] ? p.name[0] : '?').toUpperCase());
 
     return `<div class="player-row ${runDone ? 'ended-run' : 'active-run'}">
-      <div class="p-avatar" style="background:linear-gradient(135deg,${COLORS[i%COLORS.length]},${COLORS[(i+1)%COLORS.length]})">${p.name[0].toUpperCase()}</div>
-      <div class="p-name">${p.name}</div>
+      <div class="p-avatar" style="background:linear-gradient(135deg,${COLORS[i%COLORS.length]},${COLORS[(i+1)%COLORS.length]})">${avatarChar}</div>
+      <div class="p-name">${safeName}</div>
       <div class="p-timer ${timerClass}">${timeStr}</div>
       <div class="p-pnl ${up ? 'pnl-pos' : 'pnl-neg'}">${up?'+':''}$${p.pnl.toFixed(0)}</div>
       ${!runDone && serverState === 'open'
@@ -689,15 +700,17 @@ function renderLeaderboard() {
     const color = COLORS[i % COLORS.length];
     const runDone = p.runState === 'ended';
     const t = p.timeLeft || 0;
+    const safeName = escapeHtml(p.name);
+    const avatarChar = escapeHtml((p.name && p.name[0] ? p.name[0] : '?').toUpperCase());
     const timeStr = runDone
       ? '✓ Run ended'
       : `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')} left`;
 
     return `<div class="lb-row ${runDone ? 'ended' : ''}">
       <div class="lb-rank" style="color:${i<3?['#ffd24d','#c0c8d8','#cd8f52'][i]:'var(--muted)'}">${MEDALS[i]||i+1}</div>
-      <div class="lb-av" style="background:linear-gradient(135deg,${color},${COLORS[(i+2)%COLORS.length]})">${p.name[0].toUpperCase()}</div>
+      <div class="lb-av" style="background:linear-gradient(135deg,${color},${COLORS[(i+2)%COLORS.length]})">${avatarChar}</div>
       <div class="lb-info">
-        <div class="lb-name">${p.name}</div>
+        <div class="lb-name">${safeName}</div>
         <div class="lb-sub">${p.trades} trades · ${timeStr}</div>
       </div>
       <div class="lb-val">
