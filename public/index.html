@@ -203,6 +203,9 @@ body {
 .qty-stepper { width: 44px; height: 44px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-size: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; flex-shrink: 0; transition: all 0.15s; }
 .qty-stepper:active { background: var(--surface3); border-color: var(--accent); }
 .qty-display { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; height: 44px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 22px; font-weight: 700; }
+.quick-sell-btn { padding: 0 14px; height: 44px; border-radius: 10px; border: 1px solid rgba(255,68,102,0.4); background: rgba(255,68,102,0.12); color: var(--red); font-family: var(--mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; cursor: pointer; transition: all 0.15s; white-space: nowrap; display: none; }
+.quick-sell-btn:active { background: rgba(255,68,102,0.2); }
+.quick-sell-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .cost-row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 4px; }
 .cost-row span:last-child { color: var(--text); font-weight: 700; }
 .warn-row { font-family: var(--mono); font-size: 11px; color: var(--red); margin-bottom: 8px; min-height: 16px; }
@@ -380,7 +383,9 @@ body {
     <div class="qty-stepper" onclick="changeQty(-1)">−</div>
     <div class="qty-display" id="qtyDisplay">1</div>
     <div class="qty-stepper" onclick="changeQty(1)">+</div>
+    <button class="quick-sell-btn" id="sellAllBtn" onclick="sellAllShares()">Sell All</button>
   </div>
+  <div class="cost-row"><span># Held</span><span id="drawerHeld">0</span></div>
   <div class="cost-row"><span>Price</span><span id="drawerPriceRef">—</span></div>
   <div class="cost-row"><span>Total Cost</span><span id="drawerTotal">—</span></div>
   <div class="warn-row" id="drawerWarn"></div>
@@ -402,13 +407,18 @@ let tradeSide = 'buy';
 let tradeQty = 1;
 let lastNewsText = null;
 let serverConfig = {};
+let pendingRejoinName = '';
 
 const COLORS = ['#00e5a0','#00b8ff','#ffd24d','#ff4466','#a78bfa','#f97316','#ec4899','#84cc16'];
 
 // ── WEBSOCKET ──
 function connect() {
   ws = new WebSocket(WS_URL);
-  ws.onopen = () => { setStatus('live', 'Market open — enter your name'); clearTimeout(reconnectTimer); };
+  ws.onopen = () => {
+    setStatus('live', 'Market open — enter your name');
+    clearTimeout(reconnectTimer);
+    if (pendingRejoinName) send({ type: 'JOIN', name: pendingRejoinName });
+  };
   ws.onmessage = e => handle(JSON.parse(e.data));
   ws.onclose = () => { setStatus('off', 'Reconnecting...'); reconnectTimer = setTimeout(connect, 2000); };
   ws.onerror = () => ws.close();
@@ -438,6 +448,7 @@ function handle(msg) {
 
     case 'JOINED':
       myPlayer = msg.player;
+      pendingRejoinName = msg.player?.name || pendingRejoinName;
       tickers = msg.tickers;
       leaderboard = msg.leaderboard;
       news = msg.news || [];
@@ -502,6 +513,7 @@ function handle(msg) {
     case 'MARKET_RESET':
       serverState = 'idle';
       myPlayer = null;
+      pendingRejoinName = '';
       tickers = [];
       leaderboard = [];
       news = [];
@@ -510,6 +522,10 @@ function handle(msg) {
       document.getElementById('mainScreen').classList.remove('active');
       document.getElementById('joinScreen').classList.add('active');
       updateJoinStatus();
+      break;
+
+    case 'TRADE_OK':
+      handleTradeOk(msg);
       break;
 
     case 'ERROR':
@@ -522,7 +538,17 @@ function handle(msg) {
 function join() {
   const name = document.getElementById('nameInput').value.trim();
   if (!name) { showErr('Enter your name!'); return; }
+  pendingRejoinName = name;
   send({ type: 'JOIN', name });
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function updateJoinStatus() {
@@ -673,7 +699,7 @@ function renderMarket() {
            onclick="${runOver ? '' : `openDrawer('${t.symbol}')`}">
         <div>
           <div class="stock-sym">${t.symbol}</div>
-          <div class="stock-name">${t.name}${owned > 0 ? ` · ${owned}sh` : ''}</div>
+          <div class="stock-name">${t.name} · # held ${owned}</div>
         </div>
         <div class="stock-chart">${sparkline(t.history, up)}</div>
         <div class="stock-right">
@@ -723,12 +749,16 @@ function updateDrawerPrice() {
   if (!selectedSymbol) return;
   const t = tickers.find(t => t.symbol === selectedSymbol);
   if (!t) return;
+  const held = myPlayer?.holdings?.[selectedSymbol] || 0;
   document.getElementById('drawerPrice').textContent = '$' + t.price.toFixed(2);
   document.getElementById('drawerPriceRef').textContent = '$' + t.price.toFixed(2);
+  document.getElementById('drawerHeld').textContent = String(held);
   document.getElementById('drawerTotal').textContent = '$' + (t.price * tradeQty).toFixed(2);
+  const sellAllBtn = document.getElementById('sellAllBtn');
+  sellAllBtn.disabled = held <= 0;
   let warn = '';
   if (tradeSide === 'buy' && t.price * tradeQty > (myPlayer?.cash || 0)) warn = '⚠ Not enough cash';
-  if (tradeSide === 'sell' && (myPlayer?.holdings?.[selectedSymbol] || 0) < tradeQty) warn = '⚠ Not enough shares';
+  if (tradeSide === 'sell' && held < tradeQty) warn = '⚠ Not enough shares';
   document.getElementById('drawerWarn').textContent = warn;
 }
 
@@ -738,6 +768,7 @@ function setSide(side) {
   document.getElementById('sideSell').className = 'side-btn' + (side === 'sell' ? ' sell-active' : '');
   document.getElementById('execBtn').className = `exec-btn ${side}`;
   document.getElementById('execBtn').textContent = side.toUpperCase();
+  document.getElementById('sellAllBtn').style.display = side === 'sell' ? 'inline-flex' : 'none';
   updateDrawerPrice();
 }
 
@@ -750,6 +781,18 @@ function changeQty(d) {
 function executeTrade() {
   if (!selectedSymbol || !myPlayer) return;
   send({ type: 'TRADE', symbol: selectedSymbol, side: tradeSide, qty: tradeQty });
+}
+
+function sellAllShares() {
+  if (!selectedSymbol || !myPlayer) return;
+  const held = myPlayer.holdings?.[selectedSymbol] || 0;
+  if (held <= 0) {
+    document.getElementById('drawerWarn').textContent = '⚠ No shares to sell';
+    return;
+  }
+  tradeQty = held;
+  document.getElementById('qtyDisplay').textContent = tradeQty;
+  updateDrawerPrice();
 }
 
 // ── PORTFOLIO ──
@@ -803,11 +846,13 @@ function renderLeaderboard() {
       const timeStr = runDone
         ? 'Run ended'
         : `${Math.floor(p.timeLeft/60)}:${String(p.timeLeft%60).padStart(2,'0')} left`;
+      const safeName = escapeHtml(p.name);
+      const avatarChar = escapeHtml((p.name && p.name[0] ? p.name[0] : '?').toUpperCase());
       return `<div class="lb-card ${isMe ? 'me' : ''} ${runDone ? 'run-done' : ''}">
         <div class="lb-rank-num" style="color:${i<3?['#ffd24d','#c0c8d8','#cd8f52'][i]:'var(--muted)'}">${medals[i]||i+1}</div>
-        <div class="lb-avatar" style="background:linear-gradient(135deg,${color},${COLORS[(i+2)%COLORS.length]})">${p.name[0].toUpperCase()}</div>
+        <div class="lb-avatar" style="background:linear-gradient(135deg,${color},${COLORS[(i+2)%COLORS.length]})">${avatarChar}</div>
         <div class="lb-info">
-          <div class="lb-pname">${p.name}${isMe ? ' 👈' : ''}</div>
+          <div class="lb-pname">${safeName}${isMe ? ' 👈' : ''}</div>
           <div class="lb-sub">${p.trades} trade${p.trades!==1?'s':''} · ${timeStr}</div>
         </div>
         <div class="lb-nums">
@@ -831,7 +876,7 @@ function renderEndScreen() {
   document.getElementById('myResultCard').innerHTML = myEntry ? `
     <div class="result-rank-label">Your Final Rank</div>
     <div class="result-rank">${medal}</div>
-    <div class="result-name">${myEntry.name}</div>
+    <div class="result-name">${escapeHtml(myEntry.name)}</div>
     <div class="result-stats">
       <div class="rs"><div class="rs-label">Final Value</div><div class="rs-val">$${myEntry.total.toFixed(0)}</div></div>
       <div class="rs"><div class="rs-label">P&amp;L</div><div class="rs-val" style="color:${up?'var(--green)':'var(--red)'}">${up?'+':''}$${Math.abs(pnl).toFixed(0)}</div></div>
@@ -843,9 +888,10 @@ function renderEndScreen() {
   document.getElementById('endLbList').innerHTML = leaderboard.map((p, i) => {
     const isMe = p.id === myPlayer?.id;
     const up2 = p.pnl >= 0;
+    const safeName = escapeHtml(p.name);
     return `<div class="lb-card ${isMe?'me':''}">
       <div class="lb-rank-num" style="color:${i<3?['#ffd24d','#c0c8d8','#cd8f52'][i]:'var(--muted)'}">${medals2[i]||i+1}</div>
-      <div class="lb-info"><div class="lb-pname">${p.name}</div></div>
+      <div class="lb-info"><div class="lb-pname">${safeName}</div></div>
       <div class="lb-nums">
         <div class="lb-total">$${p.total.toFixed(0)}</div>
         <div class="lb-pnl-chip ${up2?'pos':'neg'}">${up2?'+':''}${p.pnlPct.toFixed(1)}%</div>
@@ -863,13 +909,6 @@ function handleTradeOk(msg) {
   updateStrip();
   renderPortfolio();
   toast(`✓ ${msg.side.toUpperCase()} ${msg.qty}× ${msg.symbol} @ $${msg.price.toFixed(2)}`, 'success');
-}
-
-// Patch handle() for TRADE_OK
-const _handle = handle;
-function handle(msg) {
-  if (msg.type === 'TRADE_OK') { handleTradeOk(msg); return; }
-  _handle(msg);
 }
 
 // ── TOAST ──
