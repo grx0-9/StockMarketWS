@@ -31,26 +31,26 @@ const NEWS_TEMPLATES = [
   // BULLISH — strong
   { text: s => `🚀 ${s} Q3 earnings crush estimates — revenue up 34% YoY`,           impact:  0.045 },
   { text: s => `📈 ${s} wins landmark $4B government contract`,                        impact:  0.055 },
-  { text: s => `💊 ${s} FDA approves breakthrough treatment — analysts ecstatic`,      impact:  0.065 },
+  { text: s => `🧠 ${s} unveils breakthrough AI platform — demand outlook surges`,     impact:  0.065 },
   { text: s => `🤝 ${s} merger talks confirmed — premium buyout expected`,              impact:  0.070 },
   { text: s => `🏆 ${s} named to S&P 500 index — passive fund buying incoming`,        impact:  0.050 },
   { text: s => `💰 ${s} announces $2B share buyback program`,                          impact:  0.035 },
   { text: s => `🌏 ${s} expands into Asian markets — TAM doubles overnight`,           impact:  0.040 },
   { text: s => `⚡ ${s} patents revolutionary technology — licensing deals imminent`,   impact:  0.060 },
   { text: s => `📊 Analysts upgrade ${s} to "Strong Buy" — price target raised 40%`,  impact:  0.042 },
-  { text: s => `🛢️ ${s} discovers major new resource deposit`,                         impact:  0.058 },
+  { text: s => `🏗️ ${s} secures long-term strategic supply agreement at favorable rates`, impact:  0.058 },
   // BULLISH — moderate
   { text: s => `📰 ${s} reports record user growth for third consecutive quarter`,     impact:  0.022 },
   { text: s => `🤝 ${s} signs strategic partnership with Fortune 500 firm`,            impact:  0.028 },
   { text: s => `💵 ${s} raises full-year guidance citing strong demand`,               impact:  0.030 },
   { text: s => `🧑‍💼 ${s} appoints celebrated industry veteran as new CEO`,            impact:  0.018 },
-  { text: s => `🔬 ${s} Phase 3 trial shows promising results`,                        impact:  0.025 },
-  { text: s => `🌱 ${s} secures $800M green energy transition fund`,                   impact:  0.020 },
+  { text: s => `🧪 ${s} pilot launch exceeds internal performance targets`,             impact:  0.025 },
+  { text: s => `🏦 ${s} secures $800M growth facility to accelerate expansion`,         impact:  0.020 },
   // BEARISH — strong
   { text: s => `💥 ${s} misses earnings — revenue down 18%, guidance slashed`,         impact: -0.052 },
   { text: s => `⚖️ ${s} hit with massive antitrust lawsuit — DOJ investigation opens`, impact: -0.060 },
   { text: s => `🚨 ${s} CEO arrested on securities fraud charges`,                     impact: -0.075 },
-  { text: s => `📉 ${s} recalls flagship product — safety investigation underway`,     impact: -0.055 },
+  { text: s => `📉 ${s} suspends flagship launch after critical quality review`,        impact: -0.055 },
   { text: s => `🏦 ${s} discloses accounting irregularities — audit committee formed`, impact: -0.068 },
   { text: s => `💔 ${s} loses exclusive contract worth $3B annually`,                  impact: -0.050 },
   { text: s => `🌊 ${s} faces class-action lawsuit from shareholders`,                 impact: -0.040 },
@@ -58,7 +58,7 @@ const NEWS_TEMPLATES = [
   // BEARISH — moderate
   { text: s => `⚠️ ${s} warns of supply chain disruptions — margin compression ahead`, impact: -0.025 },
   { text: s => `🚪 ${s} CFO unexpectedly resigns — no successor named`,                impact: -0.022 },
-  { text: s => `🏭 ${s} shuts down key facility amid safety concerns`,                 impact: -0.030 },
+  { text: s => `🧯 ${s} halts a key operation after compliance issues surface`,         impact: -0.030 },
   { text: s => `🌧️ ${s} lowers full-year revenue outlook citing macro headwinds`,      impact: -0.028 },
   { text: s => `📦 ${s} inventory builds to 3-year high — demand slowdown feared`,    impact: -0.020 },
   // NEUTRAL
@@ -123,6 +123,14 @@ function makePlayer(name) {
   };
 }
 
+function normalizePlayerName(raw) {
+  return String(raw || '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/[^A-Za-z0-9 ._\-']/g, '')
+    .slice(0, 20);
+}
+
 // ─────────────────────────────────────────────
 // PRICE ENGINE
 // ─────────────────────────────────────────────
@@ -178,7 +186,7 @@ function tickPlayerTimers() {
     const sock = findSocketForPlayer(p.id);
     if (sock) sendTo(sock, { type: 'PLAYER_TIMER', timeLeft: p.timeLeft });
 
-    if (p.timeLeft <= 0) endPlayerRun(p);
+    if (p.timeLeft <= 0) endPlayerRun(p, { notifyLeaderboard: false });
   });
 
   // Broadcast leaderboard so admin sees updated timeLeft values
@@ -188,7 +196,8 @@ function tickPlayerTimers() {
   }
 }
 
-function endPlayerRun(player) {
+function endPlayerRun(player, options = {}) {
+  const { notifyLeaderboard = true } = options;
   // Liquidate all open positions at current market price
   Object.entries(player.holdings).forEach(([sym, qty]) => {
     const t = state.tickers.find(t => t.symbol === sym);
@@ -208,7 +217,9 @@ function endPlayerRun(player) {
       leaderboard: state.allTimeLeaderboard,
     });
   }
-  broadcast({ type: 'LEADERBOARD_UPDATE', leaderboard: state.allTimeLeaderboard });
+  if (notifyLeaderboard) {
+    broadcast({ type: 'LEADERBOARD_UPDATE', leaderboard: state.allTimeLeaderboard });
+  }
 }
 
 function rebuildLeaderboard() {
@@ -264,7 +275,7 @@ function closeMarket() {
   stopTimers();
   // Force-end any still-active players
   Object.values(state.players).forEach(p => {
-    if (p.runState === 'active') endPlayerRun(p);
+    if (p.runState === 'active') endPlayerRun(p, { notifyLeaderboard: false });
   });
   state.serverState = 'closed';
   rebuildLeaderboard();
@@ -275,12 +286,19 @@ function closeMarket() {
 // WEBSOCKET LAYER
 // ─────────────────────────────────────────────
 const clients = new Map(); // ws -> { playerId, isAdmin }
+const playerSockets = new Map(); // playerId -> ws
 
 function findSocketForPlayer(playerId) {
-  for (const [ws, ctx] of clients.entries()) {
-    if (ctx.playerId === playerId) return ws;
-  }
+  const ws = playerSockets.get(playerId);
+  if (ws && ws.readyState === WebSocket.OPEN) return ws;
+  if (ws) playerSockets.delete(playerId);
   return null;
+}
+
+function clampInt(value, fallback, min, max) {
+  const n = parseInt(value, 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
 }
 
 function broadcast(msg) {
@@ -335,11 +353,15 @@ wss.on('connection', ws => {
         if (state.serverState === 'open') {
           sendTo(ws, { type: 'ERROR', text: 'Market already open' }); return;
         }
+        const startCash = clampInt(msg.startCash, 10000, 1000, 1000000);
+        const playerRunMins = clampInt(msg.playerRunMins, 10, 1, 120);
+        const volatility = clampInt(msg.volatility, 3, 1, 10);
+        const priceUpdateSec = clampInt(msg.priceUpdateSec, 4, 1, 15);
         state.config = {
-          startCash:      msg.startCash      || 10000,
-          playerRunSecs:  (msg.playerRunMins || 10) * 60,
-          volatility:     msg.volatility     || 3,
-          priceUpdateSec: msg.priceUpdateSec || 4,
+          startCash,
+          playerRunSecs: playerRunMins * 60,
+          volatility,
+          priceUpdateSec,
         };
         // Full reset if idle or admin requested it
         if (state.serverState === 'idle' || msg.reset) {
@@ -373,6 +395,7 @@ wss.on('connection', ws => {
         if (!ctx.isAdmin) return;
         stopTimers();
         state.players = {};
+        playerSockets.clear();
         state.allTimeLeaderboard = [];
         state.news = [];
         state.tickers = [];
@@ -394,7 +417,7 @@ wss.on('connection', ws => {
         if (state.serverState !== 'open') {
           sendTo(ws, { type: 'ERROR', text: 'The market is not open right now.' }); return;
         }
-        const name = (msg.name || '').trim().slice(0, 20);
+        const name = normalizePlayerName(msg.name);
         if (!name) { sendTo(ws, { type: 'ERROR', text: 'Enter a name' }); return; }
 
         // Allow reconnect by name
@@ -405,10 +428,12 @@ wss.on('connection', ws => {
         if (player) {
           // Reconnect — just re-associate this socket
           ctx.playerId = player.id;
+          playerSockets.set(player.id, ws);
         } else {
           player = makePlayer(name);
           state.players[player.id] = player;
           ctx.playerId = player.id;
+          playerSockets.set(player.id, ws);
         }
 
         rebuildLeaderboard();
@@ -468,7 +493,14 @@ wss.on('connection', ws => {
     }
   });
 
-  ws.on('close', () => clients.delete(ws));
+  ws.on('close', () => {
+    const ctx = clients.get(ws);
+    if (ctx?.playerId) {
+      const mapped = playerSockets.get(ctx.playerId);
+      if (mapped === ws) playerSockets.delete(ctx.playerId);
+    }
+    clients.delete(ws);
+  });
 });
 
 // ─────────────────────────────────────────────
