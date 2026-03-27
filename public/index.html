@@ -91,6 +91,8 @@ body {
 .name-input::placeholder { color: var(--muted); font-weight: 400; }
 .join-btn { width: 100%; padding: 18px; background: var(--accent); color: #000; border: none; border-radius: 12px; font-family: var(--sans); font-size: 17px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
 .join-btn:active { transform: scale(0.97); }
+.tutorial-btn { width: 100%; margin-top: 10px; padding: 12px 14px; background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 10px; font-family: var(--mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+.tutorial-btn:active { transform: scale(0.98); background: var(--surface2); }
 
 .status-pill { display: flex; align-items: center; gap: 8px; justify-content: center; margin-top: 20px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
 .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
@@ -172,13 +174,18 @@ body {
 
 /* ── MARKET LIST ── */
 .market-list { padding: 8px 12px 12px; display: flex; flex-direction: column; gap: 8px; }
+.market-tools { display: none; padding: 0 12px 8px; justify-content: flex-end; }
+.compact-toggle { border: 1px solid var(--border); background: var(--surface2); color: var(--muted); border-radius: 8px; padding: 7px 10px; font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+.compact-toggle.active { color: var(--accent); border-color: rgba(0,229,160,0.35); background: rgba(0,229,160,0.08); }
 .stock-row { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
 .stock-row:active { background: var(--surface2); }
 .stock-row.selected { border-color: var(--accent); }
 /* Dim stock rows when run has ended */
 .stock-row.run-over { opacity: 0.5; cursor: default; pointer-events: none; }
 .stock-sym { font-family: var(--mono); font-size: 16px; font-weight: 700; min-width: 52px; }
-.stock-name { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.stock-name { font-size: 11px; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+.stock-meta-pnl.pos { color: var(--green); }
+.stock-meta-pnl.neg { color: var(--red); }
 .stock-chart { flex: 1; }
 .stock-chart svg { display: block; }
 .stock-right { text-align: right; flex-shrink: 0; }
@@ -203,9 +210,12 @@ body {
 .qty-stepper { width: 44px; height: 44px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-size: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; flex-shrink: 0; transition: all 0.15s; }
 .qty-stepper:active { background: var(--surface3); border-color: var(--accent); }
 .qty-display { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; height: 44px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 22px; font-weight: 700; }
-.quick-sell-btn { padding: 0 14px; height: 44px; border-radius: 10px; border: 1px solid rgba(255,68,102,0.4); background: rgba(255,68,102,0.12); color: var(--red); font-family: var(--mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; cursor: pointer; transition: all 0.15s; white-space: nowrap; display: none; }
-.quick-sell-btn:active { background: rgba(255,68,102,0.2); }
-.quick-sell-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.qty-input { width: 100%; height: 100%; background: transparent; border: none; outline: none; text-align: center; color: var(--text); font-family: var(--mono); font-size: 22px; font-weight: 700; -moz-appearance: textfield; }
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.sell-all-main { width: 100%; margin-top: 6px; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,68,102,0.45); background: rgba(255,68,102,0.06); color: var(--red); font-family: var(--mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+.sell-all-main:active { background: rgba(255,68,102,0.16); }
+.sell-all-main:disabled { opacity: 0.45; cursor: not-allowed; }
 .cost-row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 4px; }
 .cost-row span:last-child { color: var(--text); font-weight: 700; }
 .warn-row { font-family: var(--mono); font-size: 11px; color: var(--red); margin-bottom: 8px; min-height: 16px; }
@@ -280,6 +290,31 @@ body {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+@media (max-width: 480px) {
+  #joinScreen { padding: 24px 16px; }
+  .brand { margin-bottom: 28px; }
+  .brand-title { font-size: 42px; }
+  .join-card { padding: 22px 18px; border-radius: 16px; }
+  .name-input { font-size: 18px; padding: 14px 16px; }
+  .join-btn { padding: 15px; font-size: 16px; }
+  .market-tools { display: flex; }
+  body.compact-market .stock-chart { display: none; }
+  body.compact-market .stock-row { justify-content: space-between; }
+  body.compact-market .stock-name { max-width: 170px; }
+  .topbar { padding: 10px 12px 8px; }
+  .stock-row { padding: 12px; gap: 8px; }
+  .stock-name { max-width: 115px; font-size: 10px; }
+  .stock-price { font-size: 14px; }
+  .stock-pct { font-size: 10px; }
+  .player-badge { max-width: 84px; font-size: 12px; }
+  .run-timer { padding: 4px 8px; font-size: 12px; }
+  .trade-drawer { padding: 14px 14px calc(14px + var(--safe-bottom)); border-radius: 18px 18px 0 0; }
+  .qty-stepper { width: 40px; height: 40px; }
+  .qty-display { height: 40px; font-size: 20px; }
+  .qty-input { font-size: 20px; }
+  .exec-btn { padding: 14px; font-size: 16px; }
+}
 </style>
 </head>
 <body>
@@ -299,6 +334,7 @@ body {
       <span class="join-label">Your Trading Name</span>
       <input class="name-input" id="nameInput" type="text" placeholder="Enter name..." maxlength="20" autocomplete="off" autocorrect="off" spellcheck="false">
       <button class="join-btn" id="joinBtn" onclick="join()">Enter the Floor →</button>
+      <button class="tutorial-btn" onclick="location.href='tutorial.html'">How to Play</button>
       <div class="error-msg" id="joinError"></div>
     </div>
     <div class="status-pill">
@@ -341,6 +377,9 @@ body {
 
   <div class="tab-content active" id="tab-content-market">
     <div class="news-feed" id="newsFeed"></div>
+    <div class="market-tools">
+      <button class="compact-toggle" id="compactToggle" onclick="toggleCompactMarket()">Compact View</button>
+    </div>
     <div class="market-list" id="marketList"></div>
   </div>
 
@@ -381,15 +420,19 @@ body {
   </div>
   <div class="qty-row">
     <div class="qty-stepper" onclick="changeQty(-1)">−</div>
-    <div class="qty-display" id="qtyDisplay">1</div>
+    <div class="qty-display">
+      <input class="qty-input" id="qtyInput" type="number" inputmode="numeric" min="1" step="1" value="1" oninput="onQtyInputChange(this.value)" onblur="onQtyInputChange(this.value)">
+    </div>
     <div class="qty-stepper" onclick="changeQty(1)">+</div>
-    <button class="quick-sell-btn" id="sellAllBtn" onclick="sellAllShares()">Sell All</button>
   </div>
   <div class="cost-row"><span># Held</span><span id="drawerHeld">0</span></div>
   <div class="cost-row"><span>Price</span><span id="drawerPriceRef">—</span></div>
   <div class="cost-row"><span>Total Cost</span><span id="drawerTotal">—</span></div>
+  <div class="cost-row"><span>Avg Cost / sh</span><span id="drawerAvg">—</span></div>
+  <div class="cost-row"><span>Trade P&L</span><span id="drawerTradePnl">—</span></div>
   <div class="warn-row" id="drawerWarn"></div>
   <button class="exec-btn buy" id="execBtn" onclick="executeTrade()">BUY</button>
+  <button class="sell-all-main" id="sellAllInstant" onclick="instantSellAll()">Sell All (instant)</button>
 </div>
 
 <div class="toasts" id="toasts"></div>
@@ -408,6 +451,11 @@ let tradeQty = 1;
 let lastNewsText = null;
 let serverConfig = {};
 let pendingRejoinName = '';
+let holdingsCost = {}; // symbol -> avg cost per share
+const TUTORIAL_DONE_KEY = 'sf_tutorial_done';
+const COMPACT_MARKET_KEY = 'sf_compact_market';
+
+enforceTutorialGate();
 
 const COLORS = ['#00e5a0','#00b8ff','#ffd24d','#ff4466','#a78bfa','#f97316','#ec4899','#84cc16'];
 
@@ -426,6 +474,28 @@ function connect() {
 
 function send(obj) {
   if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj));
+}
+
+function enforceTutorialGate() {
+  const done = localStorage.getItem(TUTORIAL_DONE_KEY) === '1';
+  if (done) return;
+  const next = encodeURIComponent(location.pathname + location.search);
+  location.replace(`tutorial.html?next=${next}`);
+}
+
+function applyCompactState() {
+  const on = localStorage.getItem(COMPACT_MARKET_KEY) === '1';
+  document.body.classList.toggle('compact-market', on);
+  const btn = document.getElementById('compactToggle');
+  if (!btn) return;
+  btn.classList.toggle('active', on);
+  btn.textContent = on ? 'Expanded View' : 'Compact View';
+}
+
+function toggleCompactMarket() {
+  const on = !(localStorage.getItem(COMPACT_MARKET_KEY) === '1');
+  localStorage.setItem(COMPACT_MARKET_KEY, on ? '1' : '0');
+  applyCompactState();
 }
 
 function handle(msg) {
@@ -449,6 +519,7 @@ function handle(msg) {
     case 'JOINED':
       myPlayer = msg.player;
       pendingRejoinName = msg.player?.name || pendingRejoinName;
+      holdingsCost = {};
       tickers = msg.tickers;
       leaderboard = msg.leaderboard;
       news = msg.news || [];
@@ -599,6 +670,7 @@ function showEndScreen() {
 function onRunEnded() {
   myPlayer.runState = 'ended';
   myPlayer.holdings = {};
+  holdingsCost = {};
   renderRunTimer();
   document.getElementById('runEndedBanner').classList.add('show');
   renderMarket();   // dims stock rows
@@ -694,12 +766,19 @@ function renderMarket() {
   document.getElementById('marketList').innerHTML = tickers.map(t => {
     const up = t.price >= t.prevPrice;
     const owned = myPlayer?.holdings?.[t.symbol] || 0;
+    const avg = holdingsCost[t.symbol];
+    const hasAvg = owned > 0 && typeof avg === 'number' && avg > 0;
+    const posPct = hasAvg ? ((t.price - avg) / avg) * 100 : null;
+    const posPctStr = hasAvg ? `${posPct >= 0 ? '+' : ''}${posPct.toFixed(1)}%` : null;
+    const posPctClass = hasAvg ? (posPct >= 0 ? 'pos' : 'neg') : '';
     return `
       <div class="stock-row ${selectedSymbol === t.symbol ? 'selected' : ''} ${runOver ? 'run-over' : ''}"
            onclick="${runOver ? '' : `openDrawer('${t.symbol}')`}">
         <div>
           <div class="stock-sym">${t.symbol}</div>
-          <div class="stock-name">${t.name} · # held ${owned}</div>
+          <div class="stock-name">
+            ${t.name} · # held ${owned}${posPctStr ? ` · <span class="stock-meta-pnl ${posPctClass}">P&L ${posPctStr}</span>` : ''}
+          </div>
         </div>
         <div class="stock-chart">${sparkline(t.history, up)}</div>
         <div class="stock-right">
@@ -735,7 +814,8 @@ function openDrawer(symbol) {
   document.getElementById('drawerName').textContent = t.name;
   setSide(tradeSide);
   updateDrawerPrice();
-  document.getElementById('qtyDisplay').textContent = '1';
+  const qtyInput = document.getElementById('qtyInput');
+  if (qtyInput) qtyInput.value = '1';
   document.getElementById('tradeDrawer').classList.add('open');
   document.getElementById('overlay').classList.add('open');
 }
@@ -754,8 +834,24 @@ function updateDrawerPrice() {
   document.getElementById('drawerPriceRef').textContent = '$' + t.price.toFixed(2);
   document.getElementById('drawerHeld').textContent = String(held);
   document.getElementById('drawerTotal').textContent = '$' + (t.price * tradeQty).toFixed(2);
-  const sellAllBtn = document.getElementById('sellAllBtn');
-  sellAllBtn.disabled = held <= 0;
+  const avg = holdingsCost[selectedSymbol];
+  const avgSpan = document.getElementById('drawerAvg');
+  const tradePnlSpan = document.getElementById('drawerTradePnl');
+  if (avgSpan) {
+    avgSpan.textContent = typeof avg === 'number' && avg > 0 ? `$${avg.toFixed(2)}` : '—';
+  }
+  if (tradePnlSpan) {
+    if (tradeSide === 'sell' && typeof avg === 'number' && avg > 0 && tradeQty > 0) {
+      const pnl = (t.price - avg) * tradeQty;
+      tradePnlSpan.textContent = `${pnl >= 0 ? '+' : '-'}$${Math.abs(pnl).toFixed(2)}`;
+      tradePnlSpan.style.color = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+    } else {
+      tradePnlSpan.textContent = '—';
+      tradePnlSpan.style.color = 'var(--muted)';
+    }
+  }
+  const instantBtn = document.getElementById('sellAllInstant');
+  if (instantBtn) instantBtn.disabled = held <= 0;
   let warn = '';
   if (tradeSide === 'buy' && t.price * tradeQty > (myPlayer?.cash || 0)) warn = '⚠ Not enough cash';
   if (tradeSide === 'sell' && held < tradeQty) warn = '⚠ Not enough shares';
@@ -768,13 +864,13 @@ function setSide(side) {
   document.getElementById('sideSell').className = 'side-btn' + (side === 'sell' ? ' sell-active' : '');
   document.getElementById('execBtn').className = `exec-btn ${side}`;
   document.getElementById('execBtn').textContent = side.toUpperCase();
-  document.getElementById('sellAllBtn').style.display = side === 'sell' ? 'inline-flex' : 'none';
   updateDrawerPrice();
 }
 
 function changeQty(d) {
   tradeQty = Math.max(1, tradeQty + d);
-  document.getElementById('qtyDisplay').textContent = tradeQty;
+  const qtyInput = document.getElementById('qtyInput');
+  if (qtyInput) qtyInput.value = String(tradeQty);
   updateDrawerPrice();
 }
 
@@ -783,7 +879,16 @@ function executeTrade() {
   send({ type: 'TRADE', symbol: selectedSymbol, side: tradeSide, qty: tradeQty });
 }
 
-function sellAllShares() {
+function onQtyInputChange(val) {
+  let n = parseInt(val, 10);
+  if (!Number.isFinite(n) || n <= 0) n = 1;
+  tradeQty = n;
+  const qtyInput = document.getElementById('qtyInput');
+  if (qtyInput && String(qtyInput.value) !== String(n)) qtyInput.value = String(n);
+  updateDrawerPrice();
+}
+
+function instantSellAll() {
   if (!selectedSymbol || !myPlayer) return;
   const held = myPlayer.holdings?.[selectedSymbol] || 0;
   if (held <= 0) {
@@ -791,8 +896,11 @@ function sellAllShares() {
     return;
   }
   tradeQty = held;
-  document.getElementById('qtyDisplay').textContent = tradeQty;
+  const qtyInput = document.getElementById('qtyInput');
+  if (qtyInput) qtyInput.value = String(tradeQty);
+  setSide('sell');
   updateDrawerPrice();
+  executeTrade();
 }
 
 // ── PORTFOLIO ──
@@ -902,13 +1010,39 @@ function renderEndScreen() {
 
 // ── TRADE OK ──
 function handleTradeOk(msg) {
+  const sym = msg.symbol;
+  const qty = msg.qty;
+  const price = msg.price;
+  const prevQty = myPlayer.holdings?.[sym] || 0;
+  const prevAvg = holdingsCost[sym];
+
   myPlayer.cash = msg.player.cash;
   myPlayer.holdings = msg.player.holdings;
   myPlayer.trades = msg.player.trades;
+
+  if (msg.side === 'buy') {
+    const totalCostPrev = (typeof prevAvg === 'number' && prevQty > 0) ? prevAvg * prevQty : 0;
+    const totalCostNew = totalCostPrev + price * qty;
+    const newQty = prevQty + qty;
+    holdingsCost[sym] = newQty > 0 ? totalCostNew / newQty : undefined;
+  } else if (msg.side === 'sell') {
+    if (myPlayer.holdings[sym] <= 0) {
+      delete holdingsCost[sym];
+    }
+  }
+
   closeDrawer();
   updateStrip();
+  renderMarket();
   renderPortfolio();
-  toast(`✓ ${msg.side.toUpperCase()} ${msg.qty}× ${msg.symbol} @ $${msg.price.toFixed(2)}`, 'success');
+  if (msg.side === 'sell' && typeof prevAvg === 'number' && prevAvg > 0) {
+    const realized = (price - prevAvg) * qty;
+    const pnlText = `${realized >= 0 ? '+' : '-'}$${Math.abs(realized).toFixed(2)}`;
+    const avgText = `$${prevAvg.toFixed(2)}`;
+    toast(`✓ SOLD ${qty}× ${sym} @ $${price.toFixed(2)} | Avg ${avgText} | ${realized >= 0 ? 'Gain' : 'Loss'} ${pnlText}`, realized >= 0 ? 'success' : 'error');
+  } else {
+    toast(`✓ ${msg.side.toUpperCase()} ${qty}× ${sym} @ $${price.toFixed(2)}`, 'success');
+  }
 }
 
 // ── TOAST ──
@@ -922,6 +1056,7 @@ function toast(msg, type = 'success') {
 
 document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') join(); });
 
+applyCompactState();
 connect();
 </script>
 </body>
