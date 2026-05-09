@@ -283,6 +283,7 @@ function sanitizePlayer(p) {
 }
 
 function startMarket() {
+  stopTimers();
   priceTimer = setInterval(updatePrices, state.config.priceUpdateSec * 1000);
   playerTickTimer = setInterval(tickPlayerTimers, 1000);
 }
@@ -363,6 +364,9 @@ wss.on('connection', ws => {
             type: 'ADMIN_OK',
             serverState: state.serverState,
             config: state.config,
+            tickers: state.tickers,
+            leaderboard: state.allTimeLeaderboard,
+            news: state.news.slice(0, 8),
             players: Object.values(state.players).map(sanitizePlayer),
           });
         } else {

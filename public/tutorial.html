@@ -11,28 +11,34 @@
   --bg: #08090f;
   --surface: #10131c;
   --surface2: #171b27;
+  --surface3: #1e2233;
   --border: #252b3d;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; overflow: hidden; }
+html, body { min-height: 100%; }
 body {
   font-family: var(--sans);
   color: var(--text);
-  background: var(--bg);
-  display: flex;
-  flex-direction: column;
+  background:
+    radial-gradient(ellipse 85% 45% at 50% -10%, rgba(var(--accent-rgb),0.14) 0%, transparent 65%),
+    var(--bg);
 }
 
 .top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 12px 14px;
   border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  background: rgba(16,19,28,0.92);
+  backdrop-filter: blur(10px);
 }
-.back-btn {
+.nav-btn {
   border: 1px solid var(--border);
   background: var(--surface2);
   color: var(--text);
@@ -40,30 +46,30 @@ body {
   padding: 8px 10px;
   font-family: var(--mono);
   font-size: 12px;
+  cursor: pointer;
 }
-.title {
-  font-size: 18px;
-  font-weight: 800;
-}
-.sub {
-  margin-left: auto;
-  color: var(--muted);
-  font-family: var(--mono);
-  font-size: 11px;
-}
+.nav-btn.primary { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 800; }
+.title { font-size: 18px; font-weight: 800; }
+.sub { margin-left: auto; color: var(--muted); font-family: var(--mono); font-size: 11px; }
 
 .wrap {
-  flex: 1;
-  overflow-y: auto;
-  padding: 14px;
+  width: min(1040px, 100%);
+  margin: 0 auto;
+  padding: 18px 14px calc(28px + var(--safe-bottom));
 }
-
-.card {
-  background: var(--surface);
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 18px;
+  align-items: start;
+}
+.panel {
+  background: rgba(16,19,28,0.96);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 20px;
+  box-shadow: 0 16px 50px rgba(0,0,0,0.35);
 }
+.lesson { padding: 20px; }
 .step-kicker {
   font-family: var(--mono);
   font-size: 10px;
@@ -72,168 +78,260 @@ body {
   text-transform: uppercase;
 }
 .step-title {
-  margin-top: 8px;
-  font-size: 24px;
-  line-height: 1.05;
+  margin-top: 10px;
+  font-size: clamp(28px, 6vw, 54px);
+  line-height: 0.92;
+  letter-spacing: -1.5px;
   font-weight: 800;
 }
 .step-text {
-  margin-top: 10px;
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.demo {
   margin-top: 14px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
+  max-width: 640px;
+}
+.lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+.tip {
   background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 12px;
 }
-.row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-family: var(--mono);
-  font-size: 12px;
+.tip-label { font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px; color: var(--accent-2); text-transform: uppercase; }
+.tip-text { margin-top: 6px; color: var(--text); font-size: 13px; line-height: 1.35; }
+.progress {
+  margin-top: 18px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface2);
+  overflow: hidden;
 }
-.row + .row { margin-top: 7px; }
-.green { color: var(--movement-up); }
-.red { color: var(--movement-down); }
-
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transition: width 0.25s ease;
+}
 .controls {
-  margin-top: 14px;
+  margin-top: 16px;
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 .btn {
   flex: 1;
   border: none;
-  border-radius: 10px;
-  padding: 12px;
-  font-size: 14px;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 15px;
   font-weight: 800;
+  cursor: pointer;
+  font-family: var(--sans);
 }
-.btn-prev {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  color: var(--text);
-}
-.btn-next {
-  background: var(--accent);
-  color: #000;
-}
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-prev { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
+.btn-next { background: var(--accent); color: #000; }
 
-.dots {
-  margin-top: 14px;
-  display: flex;
-  justify-content: center;
-  gap: 7px;
-}
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--border);
-}
-.dot.active {
-  width: 22px;
-  background: var(--accent);
-}
-
-.quick-actions {
+.phone { padding: 12px; position: sticky; top: 72px; }
+.phone-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 4px 12px; }
+.phone-logo { font-family: var(--mono); color: var(--accent); letter-spacing: 2px; font-size: 11px; font-weight: 700; }
+.timer-chip { font-family: var(--mono); font-size: 11px; color: var(--accent-2); background: rgba(var(--accent-rgb),0.08); border: 1px solid rgba(var(--accent-rgb),0.2); border-radius: 999px; padding: 5px 9px; }
+.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+.stat { background: var(--surface2); border-radius: 12px; padding: 10px; }
+.stat span { display: block; color: var(--muted); font-family: var(--mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
+.stat strong { display: block; margin-top: 4px; font-family: var(--mono); font-size: 14px; }
+.market-card { margin-top: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; padding: 14px; }
+.stock-top { display: flex; align-items: start; justify-content: space-between; gap: 10px; }
+.sym { font-family: var(--mono); font-weight: 800; font-size: 22px; }
+.name { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.price { font-family: var(--mono); font-size: 22px; font-weight: 800; text-align: right; }
+.pct { display: inline-block; margin-top: 4px; font-family: var(--mono); font-size: 11px; border-radius: 999px; padding: 2px 8px; }
+.up { color: var(--movement-up); }
+.down { color: var(--movement-down); }
+.pct.up { background: rgba(var(--movement-up-rgb),0.15); }
+.pct.down { background: rgba(var(--movement-down-rgb),0.15); }
+.spark {
   margin-top: 12px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  height: 52px;
+  border-radius: 12px;
+  background:
+    linear-gradient(90deg, rgba(var(--accent-rgb),0.08), transparent),
+    repeating-linear-gradient(90deg, transparent 0 23px, rgba(255,255,255,0.04) 24px),
+    var(--surface3);
+  position: relative;
+  overflow: hidden;
 }
-.mini {
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--muted);
-  border-radius: 10px;
-  padding: 10px;
+.spark::after {
+  content: '';
+  position: absolute;
+  inset: 10px 8px;
+  border-bottom: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: skewY(-10deg);
+  opacity: 0.9;
+}
+.news { margin-top: 10px; font-family: var(--mono); font-size: 11px; line-height: 1.45; color: var(--accent-2); }
+.trade-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.action {
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
   font-family: var(--mono);
-  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
 }
+.buy { background: var(--movement-up); color: #000; }
+.sell { background: var(--movement-down); color: #fff; }
+.ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+.dots { display: flex; justify-content: center; gap: 7px; margin-top: 14px; }
+.dot { width: 8px; height: 8px; border-radius: 999px; background: var(--border); transition: all 0.2s; }
+.dot.active { width: 26px; background: var(--accent); }
 
-@media (max-width: 420px) {
-  .step-title { font-size: 21px; }
-  .step-text { font-size: 13px; }
+@media (max-width: 820px) {
+  .hero { grid-template-columns: 1fr; }
+  .phone { position: static; }
+  .lesson-grid { grid-template-columns: 1fr; }
   .sub { display: none; }
-  .quick-actions { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
   <div class="top">
-    <button class="back-btn" onclick="goNext()">← Back</button>
-    <div class="title">Quick Tutorial</div>
-    <div class="sub">Interactive</div>
+    <button class="nav-btn" onclick="skipTutorial()">Skip</button>
+    <div class="title">StockFloor Tutorial</div>
+    <div class="sub">Learn the flow in 60 seconds</div>
+    <button class="nav-btn primary" onclick="completeTutorial()">Start Trading</button>
   </div>
 
-  <div class="wrap">
-    <div class="card">
-      <div class="step-kicker" id="stepKicker">Step 1 / 4</div>
-      <div class="step-title" id="stepTitle"></div>
-      <div class="step-text" id="stepText"></div>
+  <main class="wrap">
+    <div class="hero">
+      <section class="panel lesson">
+        <div class="step-kicker" id="stepKicker">Step 1 / 5</div>
+        <h1 class="step-title" id="stepTitle"></h1>
+        <p class="step-text" id="stepText"></p>
+        <div class="lesson-grid" id="lessonTips"></div>
+        <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="controls">
+          <button class="btn btn-prev" id="prevBtn">Prev</button>
+          <button class="btn btn-next" id="nextBtn">Next</button>
+        </div>
+        <div class="dots" id="dots"></div>
+      </section>
 
-      <div class="demo">
-        <div class="row"><span>Ticker</span><strong id="demoTicker">APEX</strong></div>
-        <div class="row"><span>Price</span><strong id="demoPrice">$142.50</strong></div>
-        <div class="row"><span># Held</span><strong id="demoHeld">0</strong></div>
-        <div class="row"><span>P&L</span><strong id="demoPnl" class="green">+$0.00</strong></div>
-      </div>
-
-      <div class="controls">
-        <button class="btn btn-prev" id="prevBtn">Prev</button>
-        <button class="btn btn-next" id="nextBtn">Next</button>
-      </div>
-
-      <div class="dots" id="dots"></div>
-
-      <div class="quick-actions">
-        <button class="mini" id="simBuy">Simulate Buy +1</button>
-        <button class="mini" id="simSell">Simulate Sell -1</button>
-      </div>
+      <aside class="panel phone" aria-label="Interactive trading demo">
+        <div class="phone-head">
+          <div class="phone-logo">STOCKFLOOR</div>
+          <div class="timer-chip" id="demoTimer">09:42</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat"><span>Cash</span><strong id="demoCash">$10,000</strong></div>
+          <div class="stat"><span>Held</span><strong id="demoHeld">0</strong></div>
+          <div class="stat"><span>P&amp;L</span><strong id="demoPnl" class="up">+$0</strong></div>
+        </div>
+        <div class="market-card">
+          <div class="stock-top">
+            <div>
+              <div class="sym">APEX</div>
+              <div class="name">Apex Tech Inc.</div>
+            </div>
+            <div>
+              <div class="price" id="demoPrice">$142.50</div>
+              <div class="pct up" id="demoPct">+0.00%</div>
+            </div>
+          </div>
+          <div class="spark up" id="demoSpark"></div>
+          <div class="news" id="demoNews">📰 News moves prices. Watch for catalysts before trading.</div>
+          <div class="trade-actions">
+            <button class="action buy" id="simBuy">Buy 1</button>
+            <button class="action sell" id="simSell">Sell 1</button>
+            <button class="action ghost" id="simBull">Good News</button>
+            <button class="action ghost" id="simBear">Bad News</button>
+          </div>
+        </div>
+      </aside>
     </div>
-  </div>
+  </main>
 
 <script>
 const steps = [
   {
-    title: 'Join the market',
-    text: 'When the market is open, enter your name on the main page. Your personal run timer starts immediately after you join.'
+    title: 'Join when the market opens',
+    text: 'Enter your name once the admin opens the market. Your own timer starts immediately, so be ready to scan, trade, and manage risk.',
+    tips: [
+      ['Timer', 'Every trader gets a personal countdown after joining.'],
+      ['Starting Cash', 'You begin with the same cash as everyone else.'],
+      ['Reconnect', 'Use the same name to return to your active run.']
+    ]
   },
   {
-    title: 'Read momentum quickly',
-    text: 'Green means up and red means down. Watch the live news strip for catalysts, then tap a stock row to open the trade drawer and choose Buy or Sell.'
+    title: 'Read price momentum and news',
+    text: 'Green means a stock is moving up; red means it is moving down. News can create quick shocks, so check the headline before you tap into a position.',
+    tips: [
+      ['Green / Red', 'Reserved for up/down market movement.'],
+      ['Sparkline', 'Shows the recent path, not a guarantee.'],
+      ['Catalysts', 'Big headlines can move prices fast.']
+    ]
   },
   {
-    title: 'Manage your position size',
-    text: 'Use +/- to adjust quantity. In Sell mode, use Sell All for fast exits. Watch # Held so you do not oversell.'
+    title: 'Open the trade drawer',
+    text: 'Tap a stock row to choose Buy or Sell, set quantity, and review the estimated cost before executing. Buy is green; sell is red.',
+    tips: [
+      ['Buy', 'Spend cash to add shares.'],
+      ['Sell', 'Convert held shares back to cash.'],
+      ['Quantity', 'Use small sizes if volatility is high.']
+    ]
   },
   {
-    title: 'Track your score',
-    text: 'Monitor Portfolio, P&L, and Rank while trading. When your timer ends, positions are liquidated and you can keep watching live standings.'
+    title: 'Manage cash, holdings, and risk',
+    text: 'Your score is cash plus current holdings value. Holding too much of one stock can help or hurt quickly when volatility spikes.',
+    tips: [
+      ['Cash', 'Unspent cash is stable.'],
+      ['Holdings', 'Positions rise and fall with live prices.'],
+      ['Sell All', 'Fast exits help when the tape turns against you.']
+    ]
+  },
+  {
+    title: 'Finish strong on the leaderboard',
+    text: 'When your timer ends, open positions are liquidated and your result lands on the leaderboard. Highest total portfolio value wins.',
+    tips: [
+      ['Rank', 'Updates as prices and trades change.'],
+      ['End State', 'You can watch standings after your run ends.'],
+      ['Admin Kick', 'Removed players disappear from results.']
+    ]
   }
 ];
 
 let step = 0;
 let held = 0;
+let cash = 10000;
 let price = 142.5;
-let avg = 142.5;
+let avg = 0;
+let prevPrice = price;
 const TUTORIAL_DONE_KEY = 'sf_tutorial_done';
 const rawNextPath = new URLSearchParams(location.search).get('next') || 'index.html';
 const nextPath = sanitizeNextPath(rawNextPath);
 
+function money(value) {
+  return `$${Math.round(value).toLocaleString()}`;
+}
+
 function renderStep() {
+  const current = steps[step];
   document.getElementById('stepKicker').textContent = `Step ${step + 1} / ${steps.length}`;
-  document.getElementById('stepTitle').textContent = steps[step].title;
-  document.getElementById('stepText').textContent = steps[step].text;
+  document.getElementById('stepTitle').textContent = current.title;
+  document.getElementById('stepText').textContent = current.text;
+  document.getElementById('lessonTips').innerHTML = current.tips.map(([label, text]) => `
+    <div class="tip"><div class="tip-label">${label}</div><div class="tip-text">${text}</div></div>
+  `).join('');
   document.getElementById('prevBtn').disabled = step === 0;
   document.getElementById('nextBtn').textContent = step === steps.length - 1 ? 'Done' : 'Next';
+  document.getElementById('progressFill').style.width = `${((step + 1) / steps.length) * 100}%`;
   renderDots();
 }
 
@@ -243,32 +341,53 @@ function renderDots() {
   ).join('');
 }
 
-function renderDemo() {
-  document.getElementById('demoPrice').textContent = `$${price.toFixed(2)}`;
-  document.getElementById('demoHeld').textContent = String(held);
+function renderDemo(newsText) {
   const pnl = held * (price - avg);
-  const pnlEl = document.getElementById('demoPnl');
-  pnlEl.textContent = `${pnl >= 0 ? '+' : '-'}$${Math.abs(pnl).toFixed(2)}`;
-  pnlEl.className = pnl >= 0 ? 'green' : 'red';
+  const move = ((price - prevPrice) / prevPrice) * 100;
+  const up = move >= 0;
+  const pnlUp = pnl >= 0;
+  document.getElementById('demoCash').textContent = money(cash);
+  document.getElementById('demoHeld').textContent = String(held);
+  document.getElementById('demoPnl').textContent = `${pnlUp ? '+' : '-'}$${Math.abs(pnl).toFixed(0)}`;
+  document.getElementById('demoPnl').className = pnlUp ? 'up' : 'down';
+  document.getElementById('demoPrice').textContent = `$${price.toFixed(2)}`;
+  const pct = document.getElementById('demoPct');
+  pct.textContent = `${up ? '+' : ''}${move.toFixed(2)}%`;
+  pct.className = `pct ${up ? 'up' : 'down'}`;
+  document.getElementById('demoSpark').className = `spark ${up ? 'up' : 'down'}`;
+  if (newsText) document.getElementById('demoNews').textContent = newsText;
 }
 
-document.getElementById('prevBtn').addEventListener('click', () => {
-  step = Math.max(0, step - 1);
-  renderStep();
-});
+function buyOne() {
+  if (cash < price) return;
+  const totalCost = avg * held + price;
+  held += 1;
+  avg = totalCost / held;
+  cash -= price;
+  nudgePrice(0.006, '✅ Bought 1 APEX. Watch how cash, held shares, and P&L update.');
+}
 
-document.getElementById('nextBtn').addEventListener('click', () => {
-  if (step === steps.length - 1) {
-    localStorage.setItem(TUTORIAL_DONE_KEY, '1');
-    goNext();
-    return;
-  }
-  step += 1;
-  renderStep();
-});
+function sellOne() {
+  if (held <= 0) return;
+  held -= 1;
+  cash += price;
+  if (held === 0) avg = 0;
+  nudgePrice(-0.004, '💸 Sold 1 APEX. Selling reduces exposure and returns cash.');
+}
 
-function goNext() {
+function nudgePrice(percent, newsText) {
+  prevPrice = price;
+  price = Math.max(0.5, price * (1 + percent));
+  renderDemo(newsText);
+}
+
+function completeTutorial() {
+  localStorage.setItem(TUTORIAL_DONE_KEY, '1');
   location.href = nextPath;
+}
+
+function skipTutorial() {
+  completeTutorial();
 }
 
 function sanitizeNextPath(next) {
@@ -279,18 +398,24 @@ function sanitizeNextPath(next) {
   return 'index.html';
 }
 
-document.getElementById('simBuy').addEventListener('click', () => {
-  held += 1;
-  price += 0.9;
-  renderDemo();
+document.getElementById('prevBtn').addEventListener('click', () => {
+  step = Math.max(0, step - 1);
+  renderStep();
 });
 
-document.getElementById('simSell').addEventListener('click', () => {
-  if (held <= 0) return;
-  held -= 1;
-  price = Math.max(0.5, price - 0.7);
-  renderDemo();
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if (step === steps.length - 1) {
+    completeTutorial();
+    return;
+  }
+  step += 1;
+  renderStep();
 });
+
+document.getElementById('simBuy').addEventListener('click', buyOne);
+document.getElementById('simSell').addEventListener('click', sellOne);
+document.getElementById('simBull').addEventListener('click', () => nudgePrice(0.035, '🚀 APEX wins a major contract — price jumps.'));
+document.getElementById('simBear').addEventListener('click', () => nudgePrice(-0.035, '⚠️ APEX warns on margins — price drops.'));
 
 renderStep();
 renderDemo();

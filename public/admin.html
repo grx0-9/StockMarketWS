@@ -534,9 +534,18 @@ function handle(msg) {
     case 'ADMIN_OK':
       authed = true;
       serverState = msg.serverState;
+      tickers = msg.tickers || tickers;
+      leaderboard = msg.leaderboard || leaderboard;
+      news = msg.news || news;
+      document.getElementById('pinError').style.display = 'none';
       document.getElementById('pinScreen').style.display = 'none';
       document.getElementById('app').style.display = 'block';
       updateServerStateUI();
+      renderMarket();
+      renderLeaderboard();
+      renderPlayers();
+      renderNews();
+      updateStats();
       toast('Admin access granted', 'success');
       // Populate config fields if server has config
       if (msg.config) {
@@ -562,6 +571,7 @@ function handle(msg) {
       updateServerStateUI();
       renderLeaderboard();
       renderPlayers();
+      updateStats();
       toast('Market closed — all runs ended', 'success');
       break;
 
@@ -574,6 +584,8 @@ function handle(msg) {
       renderMarket();
       renderLeaderboard();
       renderPlayers();
+      renderNews();
+      updateStats();
       toast('Market reset', 'success');
       break;
 
@@ -770,9 +782,13 @@ function renderLeaderboard() {
 
 // ── NEWS ──
 function renderNews() {
-  if (!news.length) return;
-  document.getElementById('newsFeed').innerHTML = news.map(n =>
-    `<div class="news-item ${n.sentiment || 'neutral'}">${n.text}</div>`
+  const feed = document.getElementById('newsFeed');
+  if (!news.length) {
+    feed.innerHTML = '<div class="empty-state">News appears once market is open</div>';
+    return;
+  }
+  feed.innerHTML = news.map(n =>
+    `<div class="news-item ${n.sentiment || 'neutral'}">${escapeHtml(n.text)}</div>`
   ).join('');
 }
 
@@ -781,13 +797,18 @@ function updateStats() {
   document.getElementById('statPlayers').textContent = leaderboard.length;
   const active = leaderboard.filter(p => p.runState === 'active').length;
   document.getElementById('statActive').textContent = active;
-  if (leaderboard.length) {
-    document.getElementById('statTop').textContent = '$' + leaderboard[0].total.toFixed(0);
-    const avgPnl = leaderboard.reduce((s, p) => s + p.pnl, 0) / leaderboard.length;
-    const el = document.getElementById('statAvgPnl');
-    el.textContent = (avgPnl >= 0 ? '+' : '') + '$' + avgPnl.toFixed(0);
-    el.style.color = avgPnl >= 0 ? 'var(--movement-up)' : 'var(--movement-down)';
+  const topEl = document.getElementById('statTop');
+  const avgEl = document.getElementById('statAvgPnl');
+  if (!leaderboard.length) {
+    topEl.textContent = '—';
+    avgEl.textContent = '—';
+    avgEl.style.color = 'var(--text)';
+    return;
   }
+  topEl.textContent = '$' + leaderboard[0].total.toFixed(0);
+  const avgPnl = leaderboard.reduce((s, p) => s + p.pnl, 0) / leaderboard.length;
+  avgEl.textContent = (avgPnl >= 0 ? '+' : '') + '$' + avgPnl.toFixed(0);
+  avgEl.style.color = avgPnl >= 0 ? 'var(--movement-up)' : 'var(--movement-down)';
 }
 
 // ── CONN ──
@@ -799,8 +820,12 @@ function setConn(live) {
 // ── TOAST ──
 function toast(msg, type = 'success') {
   const el = document.createElement('div');
+  const icon = document.createElement('span');
+  const text = document.createElement('span');
   el.className = `toast ${type}`;
-  el.innerHTML = `<span>${type === 'success' ? '✓' : '✕'}</span><span>${msg}</span>`;
+  icon.textContent = type === 'success' ? '✓' : '✕';
+  text.textContent = msg;
+  el.append(icon, text);
   document.getElementById('toasts').appendChild(el);
   setTimeout(() => { el.style.animation = 'tOut 0.3s ease forwards'; setTimeout(() => el.remove(), 300); }, 3000);
 }
