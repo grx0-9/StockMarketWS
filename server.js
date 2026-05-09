@@ -81,6 +81,8 @@ const NEWS_TEMPLATES = [
     When timeLeft hits 0 → holdings liquidated, runState = 'ended'
     Ended players can still view prices/leaderboard but cannot trade.
 */
+const kickedPlayerNames = new Set();
+
 let state = {
   serverState: 'idle',
   config: {
@@ -129,6 +131,10 @@ function normalizePlayerName(raw) {
     .replace(/\s+/g, ' ')
     .replace(/[^A-Za-z0-9 ._\-']/g, '')
     .slice(0, 20);
+}
+
+function playerNameKey(name) {
+  return normalizePlayerName(name).toLowerCase();
 }
 
 // ─────────────────────────────────────────────
@@ -194,6 +200,23 @@ function tickPlayerTimers() {
     rebuildLeaderboard();
     broadcast({ type: 'LEADERBOARD_UPDATE', leaderboard: state.allTimeLeaderboard });
   }
+}
+
+function removePlayer(player, options = {}) {
+  const { reason = 'Removed by admin' } = options;
+  kickedPlayerNames.add(playerNameKey(player.name));
+
+  const sock = findSocketForPlayer(player.id);
+  if (sock) {
+    sendTo(sock, { type: 'KICKED', text: reason });
+    const ctx = clients.get(sock);
+    if (ctx) ctx.playerId = null;
+  }
+
+  playerSockets.delete(player.id);
+  delete state.players[player.id];
+  rebuildLeaderboard();
+  broadcast({ type: 'LEADERBOARD_UPDATE', leaderboard: state.allTimeLeaderboard });
 }
 
 function endPlayerRun(player, options = {}) {
@@ -366,6 +389,7 @@ wss.on('connection', ws => {
         // Full reset if idle or admin requested it
         if (state.serverState === 'idle' || msg.reset) {
           state.players = {};
+          kickedPlayerNames.clear();
           state.allTimeLeaderboard = [];
           state.news = [];
           initTickers();
@@ -395,6 +419,7 @@ wss.on('connection', ws => {
         if (!ctx.isAdmin) return;
         stopTimers();
         state.players = {};
+        kickedPlayerNames.clear();
         playerSockets.clear();
         state.allTimeLeaderboard = [];
         state.news = [];
@@ -408,7 +433,13 @@ wss.on('connection', ws => {
       case 'ADMIN_KICK': {
         if (!ctx.isAdmin) return;
         const target = state.players[msg.playerId];
-        if (target && target.runState === 'active') endPlayerRun(target);
+        if (!target) {
+          sendTo(ws, { type: 'ERROR', text: 'Player not found' });
+          return;
+        }
+        const name = target.name;
+        removePlayer(target, { reason: 'You were kicked by an admin.' });
+        sendTo(ws, { type: 'ADMIN_KICKED', playerId: msg.playerId, name });
         break;
       }
 
@@ -419,6 +450,9 @@ wss.on('connection', ws => {
         }
         const name = normalizePlayerName(msg.name);
         if (!name) { sendTo(ws, { type: 'ERROR', text: 'Enter a name' }); return; }
+        if (kickedPlayerNames.has(playerNameKey(name))) {
+          sendTo(ws, { type: 'ERROR', text: 'You were kicked from this market.' }); return;
+        }
 
         // Allow reconnect by name
         let player = Object.values(state.players).find(

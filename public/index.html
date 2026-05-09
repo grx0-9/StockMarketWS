@@ -7,6 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>StockFloor</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
 <style>
 :root {
   --bg: #08090f;
@@ -14,15 +15,6 @@
   --surface2: #171b27;
   --surface3: #1e2233;
   --border: #252b3d;
-  --accent: #00e5a0;
-  --blue: #00b8ff;
-  --red: #ff4466;
-  --green: #00e5a0;
-  --yellow: #ffd24d;
-  --text: #eef0f7;
-  --muted: #6b7394;
-  --mono: 'Space Mono', monospace;
-  --sans: 'Syne', sans-serif;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
@@ -54,9 +46,9 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(0,229,160,0.08) 0%, transparent 70%),
-    linear-gradient(rgba(0,229,160,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,229,160,0.025) 1px, transparent 1px);
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(var(--accent-rgb),0.08) 0%, transparent 70%),
+    linear-gradient(rgba(var(--accent-rgb),0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--accent-rgb),0.025) 1px, transparent 1px);
   background-size: auto, 40px 40px, 40px 40px;
   pointer-events: none;
 }
@@ -65,7 +57,7 @@ body {
 .brand { text-align: center; margin-bottom: 40px; }
 .brand-logo { font-family: var(--mono); font-size: 11px; letter-spacing: 5px; color: var(--accent); text-transform: uppercase; margin-bottom: 16px; }
 .brand-title { font-size: 52px; font-weight: 800; line-height: 0.9; letter-spacing: -2px; background: linear-gradient(135deg, #fff 0%, #8090aa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.brand-title em { font-style: normal; background: linear-gradient(90deg, var(--accent), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.brand-title em { font-style: normal; background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 
 /* Run duration badge on join screen */
 .run-info {
@@ -74,8 +66,8 @@ body {
   justify-content: center;
   gap: 8px;
   margin-bottom: 20px;
-  background: rgba(0,229,160,0.08);
-  border: 1px solid rgba(0,229,160,0.2);
+  background: rgba(var(--accent-rgb),0.08);
+  border: 1px solid rgba(var(--accent-rgb),0.2);
   border-radius: 10px;
   padding: 10px 16px;
   font-family: var(--mono);
@@ -96,10 +88,10 @@ body {
 
 .status-pill { display: flex; align-items: center; gap: 8px; justify-content: center; margin-top: 20px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
 .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
-.dot.live { background: var(--green); box-shadow: 0 0 8px var(--green); animation: blink 2s infinite; }
+.dot.live { background: var(--movement-up); box-shadow: 0 0 8px var(--movement-up); animation: blink 2s infinite; }
 @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
 
-.error-msg { background: rgba(255,68,102,0.1); border: 1px solid rgba(255,68,102,0.3); border-radius: 10px; padding: 12px 16px; font-family: var(--mono); font-size: 12px; color: var(--red); margin-top: 12px; display: none; }
+.error-msg { background: rgba(var(--movement-down-rgb),0.1); border: 1px solid rgba(var(--movement-down-rgb),0.3); border-radius: 10px; padding: 12px 16px; font-family: var(--mono); font-size: 12px; color: var(--movement-down); margin-top: 12px; display: none; }
 
 /* ── MAIN TRADING UI ── */
 #mainScreen { flex-direction: column; background: var(--bg); }
@@ -122,7 +114,7 @@ body {
   font-weight: 700;
 }
 .run-timer-label { font-size: 9px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
-.run-timer.urgent { color: var(--red); border-color: rgba(255,68,102,0.4); animation: blink 1s infinite; }
+.run-timer.urgent { color: var(--movement-down); border-color: rgba(var(--movement-down-rgb),0.4); animation: blink 1s infinite; }
 .run-timer.ended-chip { color: var(--muted); border-color: var(--border); font-size: 11px; }
 
 .player-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; font-size: 13px; font-weight: 700; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -133,8 +125,8 @@ body {
 .strip-stat { flex-shrink: 0; }
 .strip-label { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
 .strip-value { font-family: var(--mono); font-size: 16px; font-weight: 700; margin-top: 1px; }
-.strip-value.pos { color: var(--green); }
-.strip-value.neg { color: var(--red); }
+.strip-value.pos { color: var(--movement-up); }
+.strip-value.neg { color: var(--movement-down); }
 
 /* Run-ended banner inside main screen */
 .run-ended-banner {
@@ -142,12 +134,12 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: rgba(255,68,102,0.08);
-  border-bottom: 1px solid rgba(255,68,102,0.25);
+  background: rgba(var(--movement-down-rgb),0.08);
+  border-bottom: 1px solid rgba(var(--movement-down-rgb),0.25);
   padding: 10px 16px;
   font-family: var(--mono);
   font-size: 12px;
-  color: var(--red);
+  color: var(--movement-down);
   flex-shrink: 0;
 }
 .run-ended-banner.show { display: flex; }
@@ -166,8 +158,8 @@ body {
 .news-item:nth-child(1) { opacity: 1; border-left-color: currentColor; background: rgba(255,255,255,0.04); }
 .news-item:nth-child(2) { opacity: 0.45; }
 .news-item:nth-child(3) { opacity: 0.18; }
-.news-item.bullish  { color: var(--green); }
-.news-item.bearish  { color: var(--red); }
+.news-item.bullish  { color: var(--movement-up); }
+.news-item.bearish  { color: var(--movement-down); }
 .news-item.neutral  { color: var(--yellow); }
 @keyframes newsSlideIn { from { opacity:0; transform:translateY(-14px); } to { opacity:1; transform:translateY(0); } }
 .news-item.fresh { animation: newsSlideIn 0.35s cubic-bezier(0.22,1,0.36,1) forwards; }
@@ -176,7 +168,7 @@ body {
 .market-list { padding: 8px 12px 12px; display: flex; flex-direction: column; gap: 8px; }
 .market-tools { display: none; padding: 0 12px 8px; justify-content: flex-end; }
 .compact-toggle { border: 1px solid var(--border); background: var(--surface2); color: var(--muted); border-radius: 8px; padding: 7px 10px; font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
-.compact-toggle.active { color: var(--accent); border-color: rgba(0,229,160,0.35); background: rgba(0,229,160,0.08); }
+.compact-toggle.active { color: var(--accent); border-color: rgba(var(--accent-rgb),0.35); background: rgba(var(--accent-rgb),0.08); }
 .stock-row { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
 .stock-row:active { background: var(--surface2); }
 .stock-row.selected { border-color: var(--accent); }
@@ -185,17 +177,17 @@ body {
 .stock-left { min-width: 0; }
 .stock-sym { font-family: var(--mono); font-size: 16px; font-weight: 700; min-width: 52px; }
 .stock-name { font-size: 11px; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
-.held-chip { margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); background: rgba(0,229,160,0.1); border: 1px solid rgba(0,229,160,0.25); border-radius: 999px; padding: 2px 8px; }
+.held-chip { margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); background: rgba(var(--accent-rgb),0.1); border: 1px solid rgba(var(--accent-rgb),0.25); border-radius: 999px; padding: 2px 8px; }
 .held-count { font-size: 13px; font-weight: 800; color: var(--text); }
-.stock-meta-pnl.pos { color: var(--green); }
-.stock-meta-pnl.neg { color: var(--red); }
+.stock-meta-pnl.pos { color: var(--movement-up); }
+.stock-meta-pnl.neg { color: var(--movement-down); }
 .stock-chart { flex: 1; }
 .stock-chart svg { display: block; }
 .stock-right { text-align: right; flex-shrink: 0; }
 .stock-price { font-family: var(--mono); font-size: 16px; font-weight: 700; }
 .stock-pct { font-family: var(--mono); font-size: 11px; padding: 2px 7px; border-radius: 20px; margin-top: 2px; display: inline-block; }
-.pct-up { background: rgba(0,229,160,0.15); color: var(--green); }
-.pct-down { background: rgba(255,68,102,0.15); color: var(--red); }
+.pct-up { background: rgba(var(--movement-up-rgb),0.15); color: var(--movement-up); }
+.pct-down { background: rgba(var(--movement-down-rgb),0.15); color: var(--movement-down); }
 
 /* ── TRADE DRAWER ── */
 .trade-drawer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); border-radius: 20px 20px 0 0; padding: 16px 20px calc(16px + var(--safe-bottom)); z-index: 200; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32,0.72,0,1); max-height: 70vh; overflow-y: auto; }
@@ -207,8 +199,8 @@ body {
 .drawer-name { font-size: 12px; color: var(--muted); font-family: var(--mono); margin-bottom: 20px; }
 .side-toggle { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface2); border-radius: 10px; padding: 4px; margin-bottom: 16px; }
 .side-btn { padding: 10px; text-align: center; border-radius: 8px; font-family: var(--mono); font-size: 13px; font-weight: 700; cursor: pointer; color: var(--muted); transition: all 0.2s; }
-.side-btn.buy-active { background: var(--green); color: #000; }
-.side-btn.sell-active { background: var(--red); color: #fff; }
+.side-btn.buy-active { background: var(--movement-up); color: #000; }
+.side-btn.sell-active { background: var(--movement-down); color: #fff; }
 .qty-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .qty-stepper { width: 44px; height: 44px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-size: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; flex-shrink: 0; transition: all 0.15s; }
 .qty-stepper:active { background: var(--surface3); border-color: var(--accent); }
@@ -216,15 +208,15 @@ body {
 .qty-input { width: 100%; height: 100%; background: transparent; border: none; outline: none; text-align: center; color: var(--text); font-family: var(--mono); font-size: 22px; font-weight: 700; -moz-appearance: textfield; }
 .qty-input::-webkit-outer-spin-button,
 .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.sell-all-main { width: 100%; margin-top: 6px; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,68,102,0.45); background: rgba(255,68,102,0.06); color: var(--red); font-family: var(--mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; cursor: pointer; transition: all 0.15s; }
-.sell-all-main:active { background: rgba(255,68,102,0.16); }
+.sell-all-main { width: 100%; margin-top: 6px; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(var(--movement-down-rgb),0.45); background: rgba(var(--movement-down-rgb),0.06); color: var(--movement-down); font-family: var(--mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+.sell-all-main:active { background: rgba(var(--movement-down-rgb),0.16); }
 .sell-all-main:disabled { opacity: 0.45; cursor: not-allowed; }
 .cost-row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 4px; }
 .cost-row span:last-child { color: var(--text); font-weight: 700; }
-.warn-row { font-family: var(--mono); font-size: 11px; color: var(--red); margin-bottom: 8px; min-height: 16px; }
+.warn-row { font-family: var(--mono); font-size: 11px; color: var(--movement-down); margin-bottom: 8px; min-height: 16px; }
 .exec-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-family: var(--sans); font-size: 17px; font-weight: 800; cursor: pointer; transition: all 0.15s; margin-top: 8px; }
-.exec-btn.buy { background: var(--green); color: #000; }
-.exec-btn.sell { background: var(--red); color: #fff; }
+.exec-btn.buy { background: var(--movement-up); color: #000; }
+.exec-btn.sell { background: var(--movement-down); color: #fff; }
 .close-drawer { position: absolute; top: 16px; right: 20px; font-size: 22px; color: var(--muted); cursor: pointer; line-height: 1; }
 
 /* ── PORTFOLIO TAB ── */
@@ -233,8 +225,8 @@ body {
 .port-total-label { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
 .port-total { font-family: var(--mono); font-size: 34px; font-weight: 700; margin-bottom: 4px; }
 .port-pnl { font-family: var(--mono); font-size: 14px; font-weight: 700; }
-.port-pnl.pos { color: var(--green); }
-.port-pnl.neg { color: var(--red); }
+.port-pnl.pos { color: var(--movement-up); }
+.port-pnl.neg { color: var(--movement-down); }
 .port-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
 .port-mini { background: var(--surface2); border-radius: 10px; padding: 12px; }
 .port-mini-label { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
@@ -250,7 +242,7 @@ body {
 /* ── LEADERBOARD TAB ── */
 .lb-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
 .lb-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; transition: all 0.3s; }
-.lb-card.me { border-color: var(--accent); background: rgba(0,229,160,0.04); }
+.lb-card.me { border-color: var(--accent); background: rgba(var(--accent-rgb),0.04); }
 .lb-card.run-done { opacity: 0.6; }
 .lb-rank-num { font-family: var(--mono); font-size: 18px; font-weight: 700; width: 28px; text-align: center; flex-shrink: 0; }
 .lb-avatar { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; flex-shrink: 0; }
@@ -260,10 +252,10 @@ body {
 .lb-nums { text-align: right; flex-shrink: 0; }
 .lb-total { font-family: var(--mono); font-size: 16px; font-weight: 700; }
 .lb-pnl-chip { font-family: var(--mono); font-size: 11px; margin-top: 2px; }
-.lb-pnl-chip.pos { color: var(--green); }
-.lb-pnl-chip.neg { color: var(--red); }
+.lb-pnl-chip.pos { color: var(--movement-up); }
+.lb-pnl-chip.neg { color: var(--movement-down); }
 .lb-header { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); padding: 4px 4px 8px; display: flex; align-items: center; gap: 8px; }
-.lb-live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: blink 2s infinite; }
+.lb-live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--movement-up); box-shadow: 0 0 6px var(--movement-up); animation: blink 2s infinite; }
 
 /* ── RUN ENDED SCREEN ── */
 #endScreen { align-items: center; justify-content: flex-start; overflow-y: auto; padding: 32px 20px calc(32px + var(--safe-bottom)); gap: 20px; }
@@ -282,8 +274,8 @@ body {
 /* ── TOAST ── */
 .toasts { position: fixed; top: 70px; left: 12px; right: 12px; z-index: 999; display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
 .toast { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; font-family: var(--mono); font-size: 13px; display: flex; align-items: center; gap: 10px; animation: tIn 0.25s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-.toast.success { border-color: var(--green); }
-.toast.error { border-color: var(--red); }
+.toast.success { border-color: var(--movement-up); }
+.toast.error { border-color: var(--movement-down); }
 @keyframes tIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
 @keyframes tOut { to { opacity:0; transform:translateY(-8px); } }
 
@@ -462,7 +454,7 @@ const COMPACT_MARKET_KEY = 'sf_compact_market';
 
 enforceTutorialGate();
 
-const COLORS = ['#00e5a0','#00b8ff','#ffd24d','#ff4466','#a78bfa','#f97316','#ec4899','#84cc16'];
+const COLORS = ['#ff6a00','#ffb000','#ff8a1a','#f59e0b','#a78bfa','#c084fc','#ec4899','#f97316'];
 
 // ── WEBSOCKET ──
 function connect() {
@@ -593,10 +585,7 @@ function handle(msg) {
       tickers = [];
       leaderboard = [];
       news = [];
-      // Go back to join screen
-      document.getElementById('endScreen').classList.remove('active');
-      document.getElementById('mainScreen').classList.remove('active');
-      document.getElementById('joinScreen').classList.add('active');
+      showJoinScreen();
       updateJoinStatus();
       break;
 
@@ -604,7 +593,20 @@ function handle(msg) {
       handleTradeOk(msg);
       break;
 
+    case 'KICKED':
+      myPlayer = null;
+      pendingRejoinName = '';
+      holdingsCost = {};
+      showJoinScreen();
+      updateJoinStatus();
+      showErr(msg.text || 'You were kicked by an admin.');
+      break;
+
     case 'ERROR':
+      if ((msg.text || '').toLowerCase().includes('kicked')) {
+        pendingRejoinName = '';
+        showErr(msg.text);
+      }
       toast(msg.text, 'error');
       break;
   }
@@ -658,8 +660,16 @@ function showErr(txt) {
 }
 
 // ── SCREENS ──
+function showJoinScreen() {
+  closeDrawer();
+  document.getElementById('endScreen').classList.remove('active');
+  document.getElementById('mainScreen').classList.remove('active');
+  document.getElementById('joinScreen').classList.add('active');
+}
+
 function showMain() {
   document.getElementById('joinScreen').classList.remove('active');
+  document.getElementById('endScreen').classList.remove('active');
   document.getElementById('mainScreen').classList.add('active');
   document.getElementById('playerBadge').textContent = myPlayer.name;
   renderRunTimer();
@@ -788,7 +798,7 @@ function renderMarket() {
         </div>
         <div class="stock-chart">${sparkline(t.history, up)}</div>
         <div class="stock-right">
-          <div class="stock-price" style="color:${up ? 'var(--green)' : 'var(--red)'}">$${t.price.toFixed(2)}</div>
+          <div class="stock-price" style="color:${up ? 'var(--movement-up)' : 'var(--movement-down)'}">$${t.price.toFixed(2)}</div>
           <div class="stock-pct ${up ? 'pct-up' : 'pct-down'}">${up ? '+' : ''}${t.changePct.toFixed(2)}%</div>
         </div>
       </div>`;
@@ -850,7 +860,7 @@ function updateDrawerPrice() {
     if (tradeSide === 'sell' && typeof avg === 'number' && avg > 0 && tradeQty > 0) {
       const pnl = (t.price - avg) * tradeQty;
       tradePnlSpan.textContent = `${pnl >= 0 ? '+' : '-'}$${Math.abs(pnl).toFixed(2)}`;
-      tradePnlSpan.style.color = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+      tradePnlSpan.style.color = pnl >= 0 ? 'var(--movement-up)' : 'var(--movement-down)';
     } else {
       tradePnlSpan.textContent = '—';
       tradePnlSpan.style.color = 'var(--muted)';
@@ -941,7 +951,7 @@ function renderPortfolio() {
           return `<div class="holding-card" onclick="openDrawer('${sym}')">
             <div><div class="h-sym">${sym}</div><div class="h-qty">${qty} shares</div></div>
             <div style="flex:1"></div>
-            <div><div class="h-val">$${val.toFixed(2)}</div><div class="h-pct" style="color:${chgUp ? 'var(--green)' : 'var(--red)'}">${chgUp ? '+' : ''}${chg.toFixed(2)}%</div></div>
+            <div><div class="h-val">$${val.toFixed(2)}</div><div class="h-pct" style="color:${chgUp ? 'var(--movement-up)' : 'var(--movement-down)'}">${chgUp ? '+' : ''}${chg.toFixed(2)}%</div></div>
           </div>`;
         }).join('')}
   `;
@@ -993,8 +1003,8 @@ function renderEndScreen() {
     <div class="result-name">${escapeHtml(myEntry.name)}</div>
     <div class="result-stats">
       <div class="rs"><div class="rs-label">Final Value</div><div class="rs-val">$${myEntry.total.toFixed(0)}</div></div>
-      <div class="rs"><div class="rs-label">P&amp;L</div><div class="rs-val" style="color:${up?'var(--green)':'var(--red)'}">${up?'+':''}$${Math.abs(pnl).toFixed(0)}</div></div>
-      <div class="rs"><div class="rs-label">Return</div><div class="rs-val" style="color:${up?'var(--green)':'var(--red)'}">${up?'+':''}${myEntry.pnlPct.toFixed(1)}%</div></div>
+      <div class="rs"><div class="rs-label">P&amp;L</div><div class="rs-val" style="color:${up?'var(--movement-up)':'var(--movement-down)'}">${up?'+':''}$${Math.abs(pnl).toFixed(0)}</div></div>
+      <div class="rs"><div class="rs-label">Return</div><div class="rs-val" style="color:${up?'var(--movement-up)':'var(--movement-down)'}">${up?'+':''}${myEntry.pnlPct.toFixed(1)}%</div></div>
       <div class="rs"><div class="rs-label">Trades</div><div class="rs-val">${myEntry.trades}</div></div>
     </div>` : '<div style="text-align:center;color:var(--muted);font-family:var(--mono);padding:20px">No result data</div>';
 

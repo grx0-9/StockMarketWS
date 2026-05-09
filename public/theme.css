@@ -1,0 +1,16 @@
+:root {
+  --accent: #ff6a00;
+  --accent-rgb: 255, 106, 0;
+  --accent-2: #ffb000;
+  --accent-2-rgb: 255, 176, 0;
+  --accent-hover: #ff8a1a;
+  --movement-up: #00e5a0;
+  --movement-up-rgb: 0, 229, 160;
+  --movement-down: #ff4466;
+  --movement-down-rgb: 255, 68, 102;
+  --yellow: #ffd24d;
+  --text: #eef0f7;
+  --muted: #6b7394;
+  --mono: 'Space Mono', monospace;
+  --sans: 'Syne', sans-serif;
+}
